@@ -6,7 +6,7 @@ namespace PCG
     [System.Serializable, NodeMenuItem("Custom/TestNode", typeof(PCGGraph))]
     public class TestNode : BaseNode
     {
-        [Input(name = "In")]
+        [Input(name = "In"), SerializeField]
         public float input;
 
         [Output(name = "Out")]
@@ -17,6 +17,7 @@ namespace PCG
         protected override void Process()
         {
             output = input * 42;
+            Debug.Log(output);
         }
     }
 }
