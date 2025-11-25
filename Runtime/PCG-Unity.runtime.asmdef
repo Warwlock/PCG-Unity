@@ -1,14 +1,10 @@
 {
-    "name": "PCG-Unity.editor",
+    "name": "PCG-Unity.runtime",
     "rootNamespace": "",
     "references": [
-        "PCG-Unity.runtime",
-        "com.alelievr.NodeGraphProcessor.Editor",
-        "com.alelievr.NodeGraphProcessor.Runtime"
+        "GUID:ca937d03ee5dd4d699091438dc0f3ae6"
     ],
-    "includePlatforms": [
-        "Editor"
-    ],
+    "includePlatforms": [],
     "excludePlatforms": [],
     "allowUnsafeCode": false,
     "overrideReferences": false,
