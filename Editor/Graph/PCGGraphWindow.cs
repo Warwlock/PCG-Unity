@@ -33,9 +33,13 @@ namespace PCG.Editor
 
         protected override void InitializeWindow(BaseGraph graph)
         {
-            titleContent = new GUIContent("Default Graph");
+            titleContent = new GUIContent(graph.name);
 
-            var graphView = new BaseGraphView(this);
+            if (graphView == null)
+            {
+                graphView = new PCGGraphView(this);
+                graphView.Add(new PCGToolbar(graphView));
+            }
 
             rootView.Add(graphView);
         }
