@@ -11,7 +11,7 @@ namespace PCG.Editor
 
         protected override void AddButtons()
         {
-            AddButton("Process Graph", () => { Debug.Log("Hello World"); PCGGraphProcessor.RunOnce(graphView.graph as PCGGraph); });
+            AddButton("Process Graph", () => { Debug.Log("Hello World"); });// PCGGraphProcessor.RunOnce(graphView.graph as PCGGraph); });
         }
     }
 }
