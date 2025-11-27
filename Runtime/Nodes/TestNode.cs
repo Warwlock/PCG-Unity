@@ -11,6 +11,9 @@ namespace PCG
         [Input(name = "In"), SerializeField]
         public float input;
 
+        [Input(name = "In"), SerializeField]
+        public Transform test;
+
         /*[Input(name = "In"), SerializeField]
         public Vector3[] inputPoints;*/
 

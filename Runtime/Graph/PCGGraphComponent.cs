@@ -40,22 +40,32 @@ namespace PCG
                     yield break;
                 }
 
-                BaseJobNode node = sortedNodes[executionIndex] as BaseJobNode;
+                var node = sortedNodes[executionIndex];
 
-                JobHandle handle = node.OnStartJobProcess();
+                if (node.computeOrder < 0 || !node.canProcess)
+                    continue;
 
-                while (!handle.IsCompleted)
+                if (node is BaseJobNode bjn)
                 {
-                    yield return null;
-                }
+                    JobHandle handle = bjn.OnStartJobProcess();
 
-                if (handle.IsCompleted)
-                {
-                    node.OnEndJobProcess();
+                    while (!handle.IsCompleted)
+                    {
+                        yield return null;
+                    }
+
+                    if (handle.IsCompleted)
+                    {
+                        bjn.OnEndJobProcess();
+                    }
+                    else
+                    {
+                        yield return null;
+                    }
                 }
                 else
                 {
-                    yield return null;
+                    node.OnProcess();
                 }
             }
         }
