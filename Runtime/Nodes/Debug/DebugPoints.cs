@@ -8,6 +8,9 @@ namespace PCG
     [System.Serializable, NodeMenuItem("Debug/DebugPoints", typeof(PCGGraph))]
     public class DebugPoints : BaseNode
     {
+        [SerializeField]
+        public float pointSize = 0.1f;
+
         [Input]
         public PCGPointData points;
 
@@ -17,10 +20,11 @@ namespace PCG
             {
                 var obj = GameObject.CreatePrimitive(PrimitiveType.Cube);
                 var xPos = points.GetAttribute<float>("PosX", i);
+                var yPos = points.GetAttribute<float>("PosY", i);
                 var zPos = points.GetAttribute<float>("PosZ", i);
 
-                obj.transform.localScale = Vector3.one * 0.5f;
-                obj.transform.position = new Vector3(xPos, 0, zPos);
+                obj.transform.localScale = Vector3.one * pointSize;
+                obj.transform.position = new Vector3(xPos, yPos, zPos);
             }   
         }
     }

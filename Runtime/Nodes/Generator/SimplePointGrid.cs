@@ -2,7 +2,6 @@ using GraphProcessor;
 using Unity.Collections;
 using Unity.Jobs;
 using UnityEngine;
-using UnityEngine.Windows;
 
 namespace PCG
 {
@@ -22,7 +21,7 @@ namespace PCG
         public PCGPointData points;
 
         public NativeArray<float> gridX;
-        public NativeArray<float> gridY;
+        public NativeArray<float> gridZ;
 
         public override JobHandle OnStartJobProcess()
         {
@@ -30,14 +29,14 @@ namespace PCG
             inputPorts.PullDatas();
 
             gridX = new NativeArray<float>(XPoints * YPoints, Allocator.TempJob);
-            gridY = new NativeArray<float>(XPoints * YPoints, Allocator.TempJob);
+            gridZ = new NativeArray<float>(XPoints * YPoints, Allocator.TempJob);
             CreateGridJob jobData = new CreateGridJob
             {
                 numX = XPoints,
                 numY = YPoints,
                 pointDst = pointDistance,
                 gridX = gridX,
-                gridY = gridY
+                gridZ = gridZ
             };
             handle = jobData.Schedule();
 
@@ -52,18 +51,17 @@ namespace PCG
 
             Debug.Log("JobEnd");
 
-            points = new PCGPointData();
-            points.InitializePoints(XPoints * YPoints);
+            points = new PCGPointData(XPoints * YPoints);
 
-            points.SetAttributeList("PosX", gridX.ToArray());
-            points.SetAttributeList("PosZ", gridY.ToArray());
+            points.SetAttributeList(DefaultAttributes.PosX, gridX.ToArray());
+            points.SetAttributeList(DefaultAttributes.PosZ, gridZ.ToArray());
 
             Debug.Log("PointCopy");
 
             Debug.Log(points.Count);
 
             gridX.Dispose();
-            gridY.Dispose();
+            gridZ.Dispose();
         }
 
         struct CreateGridJob : IJob
@@ -72,7 +70,7 @@ namespace PCG
             public int numY;
             public float pointDst;
             public NativeArray<float> gridX;
-            public NativeArray<float> gridY;
+            public NativeArray<float> gridZ;
 
             public void Execute()
             {
@@ -82,10 +80,10 @@ namespace PCG
                     {
                         int index = x + (y * numX);
                         float posX = x * pointDst;
-                        float posY = y * pointDst;
+                        float posZ = y * pointDst;
 
                         gridX[index] = posX;
-                        gridY[index] = posY;
+                        gridZ[index] = posZ;
                     }
                 }
             }

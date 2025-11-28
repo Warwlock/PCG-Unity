@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -44,7 +45,7 @@ namespace PCG
 
         public int Count { get; private set; }
 
-        public void InitializePoints(int pointAmount)
+        public PCGPointData(int pointAmount)
         {
             Count = pointAmount;
 
@@ -105,6 +106,11 @@ namespace PCG
             {
                 ((AttributeBuffer<T>)buffer).Data[pointIndex] = value;
             }
+        }
+
+        public string[] GetAttributeNames(string name)
+        {
+            return _attributes.Keys.ToArray();
         }
 
     }
