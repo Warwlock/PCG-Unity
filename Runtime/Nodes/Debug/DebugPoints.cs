@@ -16,16 +16,22 @@ namespace PCG
 
         protected override void Process()
         {
-            for (int i = 0; i < points.Count; i++)
-            {
-                var obj = GameObject.CreatePrimitive(PrimitiveType.Cube);
-                var xPos = points.GetAttribute<float>("PosX", i);
-                var yPos = points.GetAttribute<float>("PosY", i);
-                var zPos = points.GetAttribute<float>("PosZ", i);
+            (graph as PCGGraph).debugPointsCount += points.Count;
 
-                obj.transform.localScale = Vector3.one * pointSize;
-                obj.transform.position = new Vector3(xPos, yPos, zPos);
-            }   
+            for(int i = 0; i < points.Count; i++)
+            {
+                Vector3 pos = new Vector3();
+                pos.x = points.GetAttribute<float>(DefaultAttributes.PosX, i);
+                pos.y = points.GetAttribute<float>(DefaultAttributes.PosY, i);
+                pos.z = points.GetAttribute<float>(DefaultAttributes.PosZ, i);
+
+                float density = points.GetAttribute<float>(DefaultAttributes.Density, i);
+
+                Matrix4x4 posMatrix = Matrix4x4.TRS(pos, Quaternion.identity, Vector3.one * pointSize);
+
+                (graph as PCGGraph).debugPointMatrices.Add(posMatrix);
+                (graph as PCGGraph).debugPointDensities.Add(density);
+            }
         }
     }
 }

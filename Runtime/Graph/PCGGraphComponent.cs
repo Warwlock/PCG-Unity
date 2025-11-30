@@ -22,7 +22,17 @@ namespace PCG
             if (processGraph)
             {
                 processGraph = false;
+                pcgGraph.ClearDebugPoints();
                 StartCoroutine(ProcessGraphCoroutine(pcgGraph));
+            }
+            if(pcgGraph.debugPointsCount > 0 && pcgGraph.debugMesh != null && pcgGraph.debugMaterial != null && pcgGraph._densityBuffer != null && pcgGraph.readyForDebugRender)
+            {
+                pcgGraph._densityBuffer.SetData(pcgGraph.debugPointDensities);
+                pcgGraph.debugMaterial.SetBuffer("_InstanceDensityBuffer", pcgGraph._densityBuffer);
+
+                var rparams = new RenderParams(pcgGraph.debugMaterial) { };
+
+                Graphics.RenderMeshInstanced(rparams, pcgGraph.debugMesh, 0, pcgGraph.debugPointMatrices);
             }
         }
 
@@ -68,6 +78,8 @@ namespace PCG
                     node.OnProcess();
                 }
             }
+
+            pcgGraph.CreateDebugPoints();
         }
     }
 }
