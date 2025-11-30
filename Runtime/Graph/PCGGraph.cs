@@ -14,7 +14,7 @@ namespace PCG
         public GraphicsBuffer _densityBuffer;
 
         [HideInInspector] public List<Matrix4x4> debugPointMatrices = new();
-        public List<float> debugPointDensities = new();
+        [HideInInspector] public List<float> debugPointDensities = new();
         public int debugPointsCount;
         [HideInInspector] public bool readyForDebugRender;
 
