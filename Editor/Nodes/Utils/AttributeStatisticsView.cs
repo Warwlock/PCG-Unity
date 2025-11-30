@@ -22,7 +22,7 @@ namespace PCG.Editor
 
             DrawDefaultInspector();
 
-            controlsContainer.Add(new Label("Hello"));
+            //controlsContainer.Add(new Label("Hello"));
 
             var fields = nodeTarget.GetType().GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance)
                 .Where(f => f.DeclaringType != typeof(BaseNode));

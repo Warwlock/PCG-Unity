@@ -12,11 +12,25 @@ namespace PCG
         [SerializeField]
         public string attributeName;
 
+        public enum Statistics
+        {
+            Mean,
+            Median,
+            Sum,
+            Min,
+            Max,
+            Range,
+            StdDev,
+            Variance
+        }
+        [SerializeField]
+        public Statistics statistics;
+
         [Input]
         public PCGPointData pointsIn;
 
         [Output]
-        public PCGPointData points;
+        public float statisticsResult;
 
         public NativeArray<float> result;
 
@@ -24,10 +38,11 @@ namespace PCG
         {
             inputPorts.PullDatas();
 
-            result = new NativeArray<float>(pointsIn.Count, Allocator.TempJob);
+            result = new NativeArray<float>(pointsIn.GetAttributeList<float>(attributeName), Allocator.TempJob);// Has to dynamically select type
+
             AttributeStatisticsJob jobData = new AttributeStatisticsJob
             {
-                value = value,
+                statistics = (int)statistics,
                 count = pointsIn.Count,
                 result = result
             };
@@ -40,25 +55,121 @@ namespace PCG
         {
             handle.Complete();
 
-            pointsIn.SetAttributeList(DefaultAttributes.Density, result.ToArray());
-
-            points = pointsIn;
+            statisticsResult = result[0];
+            Debug.Log(statisticsResult);
 
             result.Dispose();
         }
 
         struct AttributeStatisticsJob : IJob
         {
-            public float value;
+            public int statistics;
             public int count;
             public NativeArray<float> result;
 
             public void Execute()
             {
+                float value = 0;
+                if (statistics == 0)
+                {
+                    result[0] = Median();
+                }
+
+                if(statistics == 1)
+                {
+                    if((count + 1) % 2 == 0)
+                    {
+                        result[0] = result[(count + 1) / 2];
+                    }
+                    else
+                    {
+                        result[0] = (result[count / 2] + result[count / 2 + 1]) / 2;
+                    }
+                }
+
+                if(statistics == 2)
+                {
+                    for (int i = 0; i < count; i++)
+                    {
+                        value += result[i];
+                    }
+                    result[0] = value;
+                }
+
+                if(statistics == 3)
+                {
+                    result[0] = MinValue();
+                }
+
+                if (statistics == 4)
+                {
+                    result[0] = MaxValue();
+                }
+
+                if(statistics == 5)
+                {
+                    float maxVal = MaxValue();
+                    float minVal = MinValue();
+
+                    result[0] = maxVal - minVal;
+                }
+
+                if(statistics == 6)
+                {
+                    result[0] = Mathf.Sqrt(Variance());
+                }
+
+                if (statistics == 7)
+                {
+                    result[0] = Variance();
+                }
+            }
+
+            float Median()
+            {
+                float value = 0;
+                for (int i = 0; i < count; i++)
+                {
+                    value += result[i];
+                }
+                return value / count;
+            }
+
+            float MinValue()
+            {
+                float value = float.MaxValue;
+                for (int i = 0; i < count; i++)
+                {
+                    if (result[i] < value)
+                    {
+                        value = result[i];
+                    }
+                }
+                return value;
+            }
+
+            float MaxValue()
+            {
+                float value = float.MinValue;
+                for (int i = 0; i < count; i++)
+                {
+                    if (result[i] > value)
+                    {
+                        value = result[i];
+                    }
+                }
+                return value;
+            }
+
+            float Variance()
+            {
+                float median = Median();
+                float add = 0;
                 for(int i = 0; i < count; i++)
                 {
-                    result[i] = value * 2;
+                    add += (result[i] - median) * (result[i] - median);
                 }
+                return add / (count - 1);
             }
         }
     }
