@@ -25,7 +25,6 @@ namespace PCG
 
         public override JobHandle OnStartJobProcess()
         {
-            Debug.Log("JobStart");
             inputPorts.PullDatas();
 
             gridX = new NativeArray<float>(XPoints * YPoints, Allocator.TempJob);
@@ -40,8 +39,6 @@ namespace PCG
             };
             handle = jobData.Schedule();
 
-            Debug.Log("JobStart2");
-
             return handle;
         }
 
@@ -49,14 +46,10 @@ namespace PCG
         {
             handle.Complete();
 
-            Debug.Log("JobEnd");
-
             points = new PCGPointData(XPoints * YPoints);
 
             points.SetAttributeList(DefaultAttributes.PosX, gridX.ToArray());
             points.SetAttributeList(DefaultAttributes.PosZ, gridZ.ToArray());
-
-            Debug.Log("PointCopy");
 
             Debug.Log(points.Count);
 
