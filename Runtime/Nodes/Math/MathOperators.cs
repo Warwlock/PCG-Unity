@@ -14,7 +14,7 @@ namespace PCG
         }
         public enum TrigonometricFunctions
         {
-            Sine, Cosine, Tangent, _, Arcsine, Arccosine, Arctangent, Arctan2
+            Sine, Cosine, Tangent, _, Arcsine, Arccosine, Arctangent//, Arctan2
         }
         public enum Comparison
         {

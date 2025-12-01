@@ -7,11 +7,11 @@ using UnityEngine;
 
 namespace PCG
 {
-    [System.Serializable, NodeMenuItem("Math/Math", typeof(PCGGraph))]
-    public class Math : BaseJobNode
+    [System.Serializable, NodeMenuItem("Math/Comparison", typeof(PCGGraph))]
+    public class Comparison : BaseJobNode
     {
         [SerializeField]
-        public MathOperators.BasicFunctions mathFunctions;
+        public MathOperators.Comparison mathFunctions;
 
         [Input]
         public PCGPointData pointsA;
@@ -81,18 +81,10 @@ namespace PCG
                 for (int a = 0; a < countA; a++)
                 {
                     var index = a % countB;
-                    if(mathFunctions == 0)
-                        result[a] += inPoint[index];
-                    else if (mathFunctions == 1)
-                        result[a] -= inPoint[index];
-                    else if (mathFunctions == 2)
-                        result[a] *= inPoint[index];
-                    else if (mathFunctions == 3)
-                        result[a] /= inPoint[index];
-                    else if (mathFunctions == 5)
-                        result[a] = math.pow(result[a], inPoint[index]);
-                    else if (mathFunctions == 6)
-                        result[a] = math.log10(result[a]) / math.log10(inPoint[index]);
+                    if (mathFunctions == 0) result[a] = math.min(result[a], inPoint[index]);
+                    if (mathFunctions == 1) result[a] = math.max(result[a], inPoint[index]);
+                    if (mathFunctions == 2) result[a] = result[a] < inPoint[index] ? 1f : 0f;
+                    if (mathFunctions == 3) result[a] = result[a] > inPoint[index] ? 1f : 0f;
                 }
             }
         }

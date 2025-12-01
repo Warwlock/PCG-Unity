@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -9,6 +10,7 @@ namespace PCG
     public interface IAttributeBuffer
     {
         void Init(int count);
+        IAttributeBuffer Clone();
         //void Resize(int newSize);
         //void Copy(int sourceIndex, int destIndex);
         System.Type GetDataType();
@@ -37,23 +39,33 @@ namespace PCG
         }*/
 
         public System.Type GetDataType() => typeof(T);
+
+        public IAttributeBuffer Clone()
+        {
+            var buffer = new AttributeBuffer<T>();
+            buffer.Data = (T[])Data.Clone();
+            return buffer;
+        }
     }
 
+    [Serializable]
     public class PCGPointData
     {
         private Dictionary<string, IAttributeBuffer> _attributes = new();
 
-        public int Count { get; private set; }
+        public int Count;// { get; private set; }
         public string lastModifiedAttribute;
 
         public PCGPointData(int pointAmount)
         {
             Count = pointAmount;
+        }
 
-            /*foreach (var attr in _attributes.Values)
-            {
-                attr.Init(Count);
-            }*/
+        public PCGPointData(PCGPointData copyData)
+        {
+            Count = copyData.Count;
+            _attributes = copyData._attributes.ToDictionary(entry => entry.Key, entry => entry.Value.Clone());
+            lastModifiedAttribute = copyData.lastModifiedAttribute;
         }
 
         public void CreateAttribute<T>(string name, T defaultValue = default)
@@ -98,7 +110,7 @@ namespace PCG
             }
             else
             {
-                var buffer1 = new AttributeBuffer<T>();
+                AttributeBuffer<T> buffer1 = new();
                 buffer1.Data = value;
                 _attributes.Add(name, buffer1);
             }
