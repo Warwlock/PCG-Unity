@@ -13,6 +13,7 @@ namespace PCG
         [HideInInspector]
         public string errorString;
         public abstract JobHandle OnStartJobProcess();
+        public static JobHandle emptyHandle = new JobHandle();
 
         public void OnEndJobProcess()
         {
@@ -23,13 +24,15 @@ namespace PCG
             outputPorts.PushDatas();
         }
 
-        protected void CheckNull(object property)
+        protected bool CheckNull(object property)
         {
             if(property == null)
             {
-                errorString = $"{property} is null";
+                errorString = $"Some of ports didn't connected";
                 Debug.LogError(errorString);
+                return true;
             }
+            return false;
         }
             
     }

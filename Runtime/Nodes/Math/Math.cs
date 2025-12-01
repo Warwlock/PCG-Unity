@@ -7,7 +7,7 @@ using UnityEngine;
 
 namespace PCG
 {
-    [System.Serializable, NodeMenuItem("Utils/Math", typeof(PCGGraph))]
+    [System.Serializable, NodeMenuItem("Math/Math", typeof(PCGGraph))]
     public class Math : BaseJobNode
     {
         [SerializeField]
@@ -21,6 +21,7 @@ namespace PCG
 
         public string attributeA = DefaultAttributes.LastModifiedAttribute;
         public string attributeB = DefaultAttributes.LastModifiedAttribute;
+        public string attributeOut = DefaultAttributes.LastModifiedAttribute;
 
         [Output]
         public PCGPointData points;
@@ -32,10 +33,10 @@ namespace PCG
         {
             inputPorts.PullDatas();
 
-            CheckNull(pointsA);
-            CheckNull(pointsB);
+            if (CheckNull(pointsA)) return emptyHandle;
+            if (CheckNull(pointsB)) return emptyHandle;
 
-            if(pointsA.Count < pointsB.Count)
+            if (pointsA.Count < pointsB.Count)
             {
                 throw new Exception($"Mismatch between the number of points from pointsB[{pointsB.Count}] and pointsA[{pointsA.Count}]");
             }
@@ -59,9 +60,9 @@ namespace PCG
         {
             handle.Complete();
 
-            pointsA.SetAttributeList(DefaultAttributes.Density, result.ToArray());
-
             points = pointsA;
+
+            points.SetAttributeList(attributeOut, result.ToArray());
 
             result.Dispose();
             inPoint.Dispose();

@@ -69,6 +69,8 @@ namespace PCG
 
         public T[] GetAttributeList<T>(string name)
         {
+            if (name == DefaultAttributes.LastModifiedAttribute)
+                name = lastModifiedAttribute;
             if (_attributes.TryGetValue(name, out var buffer))
             {
                 return ((AttributeBuffer<T>)buffer).Data;
@@ -88,6 +90,8 @@ namespace PCG
 
         public void SetAttributeList<T>(string name, T[] value)
         {
+            if (name == DefaultAttributes.LastModifiedAttribute)
+                name = lastModifiedAttribute;
             if (_attributes.TryGetValue(name, out var buffer))
             {
                 ((AttributeBuffer<T>)buffer).Data = value;

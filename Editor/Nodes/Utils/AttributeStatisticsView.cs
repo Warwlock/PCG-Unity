@@ -19,9 +19,9 @@ namespace PCG.Editor
 
             base.Enable();
 
-            var errorLabel = new Label(node.errorString);
+            /*var errorLabel = new Label(node.errorString);
 
-            controlsContainer.Add(errorLabel);
+            controlsContainer.Add(errorLabel);*/
         }
     }
 }

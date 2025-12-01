@@ -61,6 +61,12 @@ namespace PCG
                 {
                     JobHandle handle = bjn.OnStartJobProcess();
 
+                    if (handle.Equals(BaseJobNode.emptyHandle))
+                    {
+                        Debug.Log("A Node Empty");
+                        continue;
+                    }
+
                     while (!handle.IsCompleted)
                     {
                         yield return null;
