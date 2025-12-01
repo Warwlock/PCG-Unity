@@ -51,8 +51,6 @@ namespace PCG
             points.SetAttributeList(DefaultAttributes.PosX, gridX.ToArray());
             points.SetAttributeList(DefaultAttributes.PosZ, gridZ.ToArray());
 
-            Debug.Log(points.Count);
-
             gridX.Dispose();
             gridZ.Dispose();
         }

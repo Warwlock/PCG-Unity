@@ -44,6 +44,7 @@ namespace PCG
         private Dictionary<string, IAttributeBuffer> _attributes = new();
 
         public int Count { get; private set; }
+        public string lastModifiedAttribute;
 
         public PCGPointData(int pointAmount)
         {
@@ -97,6 +98,7 @@ namespace PCG
                 buffer1.Data = value;
                 _attributes.Add(name, buffer1);
             }
+            lastModifiedAttribute = name;
         }
 
 
@@ -106,9 +108,10 @@ namespace PCG
             {
                 ((AttributeBuffer<T>)buffer).Data[pointIndex] = value;
             }
+            lastModifiedAttribute = name;
         }
 
-        public string[] GetAttributeNames(string name)
+        public string[] GetAttributeNames()
         {
             return _attributes.Keys.ToArray();
         }

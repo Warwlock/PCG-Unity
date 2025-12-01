@@ -10,21 +10,10 @@ namespace PCG
     public class AttributeStatistics : BaseJobNode
     {
         [SerializeField]
-        public string attributeName;
+        public string attributeName = DefaultAttributes.LastModifiedAttribute;
 
-        public enum Statistics
-        {
-            Mean,
-            Median,
-            Sum,
-            Min,
-            Max,
-            Range,
-            StdDev,
-            Variance
-        }
         [SerializeField]
-        public Statistics statistics;
+        public MathOperators.Statistics statistics;
 
         [Input]
         public PCGPointData pointsIn;
@@ -37,6 +26,8 @@ namespace PCG
         public override JobHandle OnStartJobProcess()
         {
             inputPorts.PullDatas();
+
+            CheckNull(pointsIn);
 
             result = new NativeArray<float>(pointsIn.GetAttributeList<float>(attributeName), Allocator.TempJob);// Has to dynamically select type
 
@@ -56,7 +47,6 @@ namespace PCG
             handle.Complete();
 
             statisticsResult = result[0];
-            Debug.Log(statisticsResult);
 
             result.Dispose();
         }

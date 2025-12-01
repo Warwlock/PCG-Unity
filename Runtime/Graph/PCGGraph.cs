@@ -1,5 +1,6 @@
 using GraphProcessor;
 using NUnit.Framework;
+using System;
 using System.Collections.Generic;
 using Unity.Collections;
 using UnityEngine;
@@ -32,5 +33,25 @@ namespace PCG
             _densityBuffer = new GraphicsBuffer(GraphicsBuffer.Target.Structured, debugPointsCount, sizeof(float));
             readyForDebugRender = true;
         }
+
+        public void ClearDelegates()
+        {
+            OnStart = null;
+            OnUpdate = null;
+        }
+
+        public void CallOnStart()
+        {
+            OnStart?.Invoke();
+        }
+
+        public void CallOnUpdate()
+        {
+            OnUpdate?.Invoke();
+        }
+
+        public event Action OnStart;
+
+        public event Action OnUpdate;
     }
 }

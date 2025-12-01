@@ -10,6 +10,8 @@ namespace PCG
     {
         public JobHandle handle;
 
+        [HideInInspector]
+        public string errorString;
         public abstract JobHandle OnStartJobProcess();
 
         public void OnEndJobProcess()
@@ -20,5 +22,15 @@ namespace PCG
 
             outputPorts.PushDatas();
         }
+
+        protected void CheckNull(object property)
+        {
+            if(property == null)
+            {
+                errorString = $"{property} is null";
+                Debug.LogError(errorString);
+            }
+        }
+            
     }
 }

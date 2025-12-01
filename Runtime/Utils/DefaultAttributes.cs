@@ -14,5 +14,12 @@ namespace PCG
         public static string RotW = "RotW";
 
         public static string Density = "Density";
+
+        public static string LastModifiedAttribute = "@Last";
+
+        public enum DefaultAttributesEnum
+        {
+            PosX, PosY, PosZ, RotX, RotY, RotZ, RotW, Density
+        }
     }
 }
