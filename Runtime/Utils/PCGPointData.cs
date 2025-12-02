@@ -6,7 +6,6 @@ using UnityEngine.UIElements;
 
 namespace PCG
 {
-    // Interface allows us to store different types in one dictionary
     public interface IAttributeBuffer
     {
         void Init(int count);
@@ -16,7 +15,6 @@ namespace PCG
         System.Type GetDataType();
     }
 
-    // The concrete implementation for specific types (Float, Vector3, Bool, etc)
     public class AttributeBuffer<T> : IAttributeBuffer
     {
         public T[] Data;
@@ -25,18 +23,6 @@ namespace PCG
         {
             Data = new T[count];
         }
-
-        /*public void Resize(int newSize)
-        {
-            // Logic to expand list or trim it
-            while (Data.Count < newSize) Data.Add(default);
-        }*/
-
-        /*public void Copy(int sourceIndex, int destIndex)
-        {
-            if (sourceIndex < Data.Count && destIndex < Data.Count)
-                Data[destIndex] = Data[sourceIndex];
-        }*/
 
         public System.Type GetDataType() => typeof(T);
 
@@ -73,7 +59,6 @@ namespace PCG
             if (_attributes.ContainsKey(name)) return;
 
             var buffer = new AttributeBuffer<T>();
-            // Fill existing points with default value
             for (int i = 0; i < Count; i++) buffer.Data[i] = defaultValue;
 
             _attributes.Add(name, buffer);
