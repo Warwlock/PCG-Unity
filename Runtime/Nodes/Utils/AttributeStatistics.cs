@@ -29,7 +29,7 @@ namespace PCG
 
             if (CheckNull(pointsIn)) return emptyHandle;
 
-            result = new NativeArray<float>(pointsIn.GetAttributeList<float>(attributeName), Allocator.TempJob);// Has to dynamically select type
+            result = new NativeArray<float>(pointsIn.GetAttributeList<float>(attributeName), Allocator.TempJob);
 
             AttributeStatisticsJob jobData = new AttributeStatisticsJob
             {

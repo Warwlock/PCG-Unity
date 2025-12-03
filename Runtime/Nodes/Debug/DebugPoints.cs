@@ -21,9 +21,7 @@ namespace PCG
             for(int i = 0; i < points.Count; i++)
             {
                 Vector3 pos = new Vector3();
-                pos.x = points.GetAttribute<float>(DefaultAttributes.PosX, i);
-                pos.y = points.GetAttribute<float>(DefaultAttributes.PosY, i);
-                pos.z = points.GetAttribute<float>(DefaultAttributes.PosZ, i);
+                pos = points.GetAttribute<Vector3>(DefaultAttributes.Pos, i);
 
                 float density = points.GetAttribute<float>(DefaultAttributes.Density, i);
 

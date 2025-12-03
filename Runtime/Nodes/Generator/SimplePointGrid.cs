@@ -20,24 +20,33 @@ namespace PCG
         [Output]
         public PCGPointData points;
 
-        public NativeArray<float> gridX;
-        public NativeArray<float> gridZ;
+        public NativeArray<float> grid;
+        public NativeArray<Vector3> vectorGrid;
 
         public override JobHandle OnStartJobProcess()
         {
             inputPorts.PullDatas();
 
-            gridX = new NativeArray<float>(XPoints * YPoints, Allocator.TempJob);
-            gridZ = new NativeArray<float>(XPoints * YPoints, Allocator.TempJob);
-            CreateGridJob jobData = new CreateGridJob
+            grid = new NativeArray<float>(XPoints * YPoints * 3, Allocator.TempJob);
+            vectorGrid = new NativeArray<Vector3>(XPoints * YPoints, Allocator.TempJob);
+
+            CreateGridJob createGridJob = new CreateGridJob
             {
                 numX = XPoints,
                 numY = YPoints,
                 pointDst = pointDistance,
-                gridX = gridX,
-                gridZ = gridZ
+                grid = grid
             };
-            handle = jobData.Schedule();
+
+            CombineVector3Job combineJob = new CombineVector3Job
+            {
+                count = XPoints * YPoints,
+                array = grid,
+                result = vectorGrid
+            };
+
+            JobHandle createGridHandle = createGridJob.Schedule();
+            handle = combineJob.Schedule(createGridHandle);
 
             return handle;
         }
@@ -48,11 +57,9 @@ namespace PCG
 
             points = new PCGPointData(XPoints * YPoints);
 
-            points.SetAttributeList(DefaultAttributes.PosX, gridX.ToArray());
-            points.SetAttributeList(DefaultAttributes.PosZ, gridZ.ToArray());
+            points.SetAttributeList(DefaultAttributes.Pos, vectorGrid.ToArray());
 
-            gridX.Dispose();
-            gridZ.Dispose();
+            grid.Dispose();
         }
 
         struct CreateGridJob : IJob
@@ -60,8 +67,7 @@ namespace PCG
             public int numX;
             public int numY;
             public float pointDst;
-            public NativeArray<float> gridX;
-            public NativeArray<float> gridZ;
+            public NativeArray<float> grid;
 
             public void Execute()
             {
@@ -73,8 +79,8 @@ namespace PCG
                         float posX = x * pointDst;
                         float posZ = y * pointDst;
 
-                        gridX[index] = posX;
-                        gridZ[index] = posZ;
+                        grid[index] = posX;
+                        grid[index + numX * numY * 2] = posZ;
                     }
                 }
             }

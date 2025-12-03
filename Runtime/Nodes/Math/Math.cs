@@ -67,34 +67,5 @@ namespace PCG
             result.Dispose();
             inPoint.Dispose();
         }
-
-        struct MathJob : IJob
-        {
-            public int mathFunctions;
-            public int countA;
-            public int countB;
-            public NativeArray<float> inPoint;
-            public NativeArray<float> result;
-
-            public void Execute()
-            {
-                for (int a = 0; a < countA; a++)
-                {
-                    var index = a % countB;
-                    if(mathFunctions == 0)
-                        result[a] += inPoint[index];
-                    else if (mathFunctions == 1)
-                        result[a] -= inPoint[index];
-                    else if (mathFunctions == 2)
-                        result[a] *= inPoint[index];
-                    else if (mathFunctions == 3)
-                        result[a] /= inPoint[index];
-                    else if (mathFunctions == 5)
-                        result[a] = math.pow(result[a], inPoint[index]);
-                    else if (mathFunctions == 6)
-                        result[a] = math.log10(result[a]) / math.log10(inPoint[index]);
-                }
-            }
-        }
     }
 }

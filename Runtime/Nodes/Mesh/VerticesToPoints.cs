@@ -55,9 +55,9 @@ namespace PCG
 
             points = new PCGPointData(mesh.vertices.Length);
 
-            points.SetAttributeList(DefaultAttributes.PosX, resultX.ToArray());
+            /*points.SetAttributeList(DefaultAttributes.PosX, resultX.ToArray());
             points.SetAttributeList(DefaultAttributes.PosY, resultY.ToArray());
-            points.SetAttributeList(DefaultAttributes.PosZ, resultZ.ToArray());
+            points.SetAttributeList(DefaultAttributes.PosZ, resultZ.ToArray());*/
 
             vertices.Dispose();
             resultX.Dispose();

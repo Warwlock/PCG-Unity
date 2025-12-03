@@ -38,6 +38,7 @@ namespace PCG
     public class PCGPointData
     {
         private Dictionary<string, IAttributeBuffer> _attributes = new();
+        //private Dictionary<string, Type> _attributeTypes = new();
 
         public int Count;// { get; private set; }
         public string lastModifiedAttribute;
@@ -51,6 +52,7 @@ namespace PCG
         {
             Count = copyData.Count;
             _attributes = copyData._attributes.ToDictionary(entry => entry.Key, entry => entry.Value.Clone());
+            //_attributeTypes = copyData._attributeTypes.ToDictionary(entry => entry.Key, entry => entry.Value);
             lastModifiedAttribute = copyData.lastModifiedAttribute;
         }
 
@@ -66,8 +68,8 @@ namespace PCG
 
         public T[] GetAttributeList<T>(string name)
         {
-            if (name == DefaultAttributes.LastModifiedAttribute)
-                name = lastModifiedAttribute;
+            name = NameSeparator(name);
+
             if (_attributes.TryGetValue(name, out var buffer))
             {
                 return ((AttributeBuffer<T>)buffer).Data;
@@ -87,8 +89,8 @@ namespace PCG
 
         public void SetAttributeList<T>(string name, T[] value)
         {
-            if (name == DefaultAttributes.LastModifiedAttribute)
-                name = lastModifiedAttribute;
+            name = NameSeparator(name);
+
             if (_attributes.TryGetValue(name, out var buffer))
             {
                 ((AttributeBuffer<T>)buffer).Data = value;
@@ -103,18 +105,31 @@ namespace PCG
         }
 
 
-        public void SetAttribute<T>(string name, int pointIndex, T value)
+        /*public void SetAttribute<T>(string name, int pointIndex, T value)
         {
             if (_attributes.TryGetValue(name, out var buffer))
             {
                 ((AttributeBuffer<T>)buffer).Data[pointIndex] = value;
             }
             lastModifiedAttribute = name;
-        }
+        }*/
 
         public string[] GetAttributeNames()
         {
             return _attributes.Keys.ToArray();
+        }
+
+        string NameSeparator(string name)
+        {
+            if (name == DefaultAttributes.LastModifiedAttribute)
+                name = lastModifiedAttribute;
+
+            /*if (name.Contains('.'))
+            {
+                name = name.Split('.').First();
+            }*/
+
+            return name;
         }
 
     }
