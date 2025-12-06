@@ -153,8 +153,6 @@ namespace PCG
             else
                 stripAxis = 0;
 
-            Debug.Log(stripAxis);
-
 
             return name.Split('.').First();
         }

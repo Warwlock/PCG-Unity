@@ -46,13 +46,10 @@ namespace PCG
                 throw new Exception($"Mismatch between the types from pointsB[{pointsB.Count}] and pointsA[{pointsA.Count}]");
             }
 
-            /*inPoint = new NativeArray<float>(pointsB.GetAttributeList<float>(attributeB), Allocator.TempJob);
-            result = new NativeArray<float>(pointsA.GetAttributeList<float>(attributeA), Allocator.TempJob);*/
-
             result = new NativeArrayCollection(pointsA, attributeA);
             inPoint = new NativeArrayCollection(pointsB, attributeB);
 
-            handle = Vector3Math(handle);
+            handle = MathJobCreator(handle);
 
             return handle;
         }
@@ -63,57 +60,58 @@ namespace PCG
 
             points = new PCGPointData(pointsA);
 
-            points.SetAttributeList(attributeOut, result.vector3Array.ToArray());
+            if (result.collectionType == typeof(Vector3))
+                points.SetAttributeList(attributeOut, result.vector3Array.ToArray());
+            if(result.collectionType == typeof(float))
+                points.SetAttributeList(attributeOut, result.floatArray.ToArray());
 
             result.Dispose();
             inPoint.Dispose();
         }
 
-        JobHandle Vector3Math(JobHandle dependsOn)
+        JobHandle MathJobCreator(JobHandle dependsOn)
         {
-            NativeArray<float> interArrayA = new NativeArray<float>(pointsA.Count * 3, Allocator.TempJob);
-            FlattenVector3Job flattenJobA = new FlattenVector3Job
-            {
-                count = pointsA.Count,
-                vector = result.vector3Array,
-                result = interArrayA
-            };
-            JobHandle flattenJobAHandle = flattenJobA.Schedule(dependsOn);
+            int axesA = 1;
+            int axesB = 1;
 
-            NativeArray<float> interArrayB = new NativeArray<float>(pointsB.Count * 3, Allocator.TempJob);
-            FlattenVector3Job flattenJobB = new FlattenVector3Job
+            JobHandle flattenJobAHandle = dependsOn;
+            if (result.collectionType == typeof(Vector3))
             {
-                count = pointsB.Count,
-                vector = inPoint.vector3Array,
-                result = interArrayB
-            };
-            JobHandle flattenJobBHandle = flattenJobB.Schedule(flattenJobAHandle);
+                flattenJobAHandle = result.CreateFlattenVector3Job(dependsOn);
+                axesA = 3;
+            }
 
+            JobHandle flattenJobBHandle = dependsOn;
+            if (inPoint.collectionType == typeof(Vector3))
+            {
+                flattenJobBHandle = inPoint.CreateFlattenVector3Job(flattenJobAHandle);
+                axesB = 3;
+            }
 
             MathJob jobData = new MathJob
             {
                 mathFunctions = (int)mathFunctions,
                 countA = pointsA.Count,
                 countB = pointsB.Count,
-                MultiplierA = result.stripAxis > 0 ? -result.stripAxis : 3,
-                MultiplierB = inPoint.stripAxis > 0 ? -inPoint.stripAxis : 3,
-                inPoint = interArrayB,
-                result = interArrayA
+                MultiplierA = result.stripAxis > 0 ? -result.stripAxis : axesA, // Support one axis (.X) (negative) and dimensions (1-3 axis) (positive)
+                MultiplierB = inPoint.stripAxis > 0 ? -inPoint.stripAxis : axesB,
+                inPoint = inPoint.floatArray,
+                result = result.floatArray
             };
             JobHandle jobDataHandle = jobData.Schedule(flattenJobBHandle);
 
-            CombineVector3Job combineResult = new CombineVector3Job
+            if (result.collectionType == typeof(Vector3))
             {
-                count = pointsA.Count,
-                array = interArrayA,
-                result = result.vector3Array
-            };
-            JobHandle combineHandle = combineResult.Schedule(jobDataHandle);
+                CombineVector3Job combineResult = new CombineVector3Job
+                {
+                    count = pointsA.Count,
+                    array = result.floatArray,
+                    result = result.vector3Array
+                };
+                jobDataHandle = combineResult.Schedule(jobDataHandle);
+            }
 
-            interArrayA.Dispose(combineHandle);
-            interArrayB.Dispose(jobDataHandle);
-
-            return combineHandle;
+            return jobDataHandle;
         }
     }
 }

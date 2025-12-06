@@ -1,5 +1,6 @@
 using System;
 using Unity.Collections;
+using Unity.Jobs;
 using UnityEngine;
 
 namespace PCG
@@ -68,6 +69,22 @@ namespace PCG
             {
                 intArray = new NativeArray<int>(pointData.GetAttributeList<int>(attributeName), Allocator.TempJob);
             }
+        }
+
+        public JobHandle CreateFlattenVector3Job(JobHandle dependsOn = default)
+        {
+            floatArray = new NativeArray<float>(vector3Array.Length * 3, Allocator.TempJob);
+
+            FlattenVector3Job flattenJobA = new FlattenVector3Job
+            {
+                count = vector3Array.Length,
+                vector = vector3Array,
+                result = floatArray
+            };
+
+            JobHandle flattenJobAHandle = flattenJobA.Schedule(dependsOn);
+
+            return flattenJobAHandle;
         }
 
         public void Dispose()
