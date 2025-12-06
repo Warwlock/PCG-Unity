@@ -17,13 +17,19 @@ namespace PCG
 
         public void Execute()
         {
-            for (int i = 0; i < MultiplierA; i++)
+            int bMul = MultiplierB > 1 ? 1 : 0;
+            int bAxis = MultiplierB < 0 ? -MultiplierB - 1 : 0;
+
+            int aMul = MultiplierA < 0 ? 1 : MultiplierA;
+            int aAxis = MultiplierA < 0 ? -MultiplierA - 1 : 0;
+
+            for (int i = 0; i < aMul; i++)
             {
                 for (int a = 0; a < countA; a++)
                 {
-                    var indexA = (MultiplierA - 1) * countA + a;
+                    var indexA = i * countA + a + countA * aAxis;
                     var indexB = a % countB;
-                    indexB = (MultiplierB - 1) * countB + indexB;
+                    indexB = i * bMul * countB + indexB + countB * bAxis;
 
                     if (mathFunctions == 0)
                         result[indexA] += inPoint[indexB];

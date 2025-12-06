@@ -60,6 +60,7 @@ namespace PCG
             points.SetAttributeList(DefaultAttributes.Pos, vectorGrid.ToArray());
 
             grid.Dispose();
+            vectorGrid.Dispose();
         }
 
         struct CreateGridJob : IJob

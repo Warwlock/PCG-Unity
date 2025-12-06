@@ -21,18 +21,23 @@ namespace PCG
         }
     }
 
-    struct FlattenVector2Job : IJob
+    struct SeparateVector3Job : IJob
     {
         public int count;
-        public NativeArray<Vector2> vector;
+        public int axis;
+        public NativeArray<Vector3> vector;
         public NativeArray<float> result;
 
-        public void Execute()
+        public void Execute() // There is a better way but I felt lazy to write
         {
             for (int i = 0; i < count; i++)
             {
-                result[i] = vector[i].x;
-                result[i + count] = vector[i].y;
+                if (axis == 1)
+                    result[i] = vector[i].x;
+                else if (axis == 2)
+                    result[i] = vector[i].y;
+                else if (axis == 3)
+                    result[i] = vector[i].z;
             }
         }
     }
@@ -54,6 +59,41 @@ namespace PCG
                 vector.z = array[count * 2 + i];
 
                 result[i] = vector;
+            }
+        }
+    }
+
+    struct FlattenVector2Job : IJob
+    {
+        public int count;
+        public NativeArray<Vector2> vector;
+        public NativeArray<float> result;
+
+        public void Execute()
+        {
+            for (int i = 0; i < count; i++)
+            {
+                result[i] = vector[i].x;
+                result[i + count] = vector[i].y;
+            }
+        }
+    }
+
+    struct SeparateVector2Job : IJob
+    {
+        public int count;
+        public int axis;
+        public NativeArray<Vector2> vector;
+        public NativeArray<float> result;
+
+        public void Execute() // There is a better way but I felt lazy to write
+        {
+            for (int i = 0; i < count; i++)
+            {
+                if (axis == 1)
+                    result[i] = vector[i].x;
+                else if (axis == 2)
+                    result[i] = vector[i].y;
             }
         }
     }

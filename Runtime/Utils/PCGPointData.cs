@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Unity.Jobs;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -42,6 +43,8 @@ namespace PCG
 
         public int Count;// { get; private set; }
         public string lastModifiedAttribute;
+        public bool requiresStripping = false;
+        public int stripAxis = 0;
 
         public PCGPointData(int pointAmount)
         {
@@ -86,7 +89,6 @@ namespace PCG
             return default;
         }
 
-
         public void SetAttributeList<T>(string name, T[] value)
         {
             name = NameSeparator(name);
@@ -105,18 +107,24 @@ namespace PCG
         }
 
 
-        /*public void SetAttribute<T>(string name, int pointIndex, T value)
-        {
-            if (_attributes.TryGetValue(name, out var buffer))
-            {
-                ((AttributeBuffer<T>)buffer).Data[pointIndex] = value;
-            }
-            lastModifiedAttribute = name;
-        }*/
-
         public string[] GetAttributeNames()
         {
             return _attributes.Keys.ToArray();
+        }
+
+        public Type GetDataType(string name)
+        {
+            name = NameSeparator(name);
+
+            if (_attributes.TryGetValue(name, out var buffer))
+            {
+                if (name.Contains("."))
+                    return typeof(float);
+
+                return buffer.GetDataType();
+            }
+
+            return null;
         }
 
         string NameSeparator(string name)
@@ -124,13 +132,31 @@ namespace PCG
             if (name == DefaultAttributes.LastModifiedAttribute)
                 name = lastModifiedAttribute;
 
-            /*if (name.Contains('.'))
-            {
-                name = name.Split('.').First();
-            }*/
+            if (name.Contains("."))
+                requiresStripping = true;
+            else
+                requiresStripping = false;
 
-            return name;
+            stripAxis = 0;
+
+            if (!requiresStripping)
+                return name;
+
+            if (name.Split('.').Last()[0] == 'X')
+                stripAxis = 1;
+            else if (name.Split('.').Last()[0] == 'Y')
+                stripAxis = 2;
+            else if (name.Split('.').Last()[0] == 'Z')
+                stripAxis = 3;
+            else if (name.Split('.').Last()[0] == 'W')
+                stripAxis = 4;
+            else
+                stripAxis = 0;
+
+            Debug.Log(stripAxis);
+
+
+            return name.Split('.').First();
         }
-
     }
 }

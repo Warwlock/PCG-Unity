@@ -14,10 +14,6 @@ namespace PCG
         [Output]
         public PCGPointData points;
 
-        public NativeArray<float> resultX;
-        public NativeArray<float> resultY;
-        public NativeArray<float> resultZ;
-
         public NativeArray<Vector3> vertices;
 
         public override JobHandle OnStartJobProcess()
@@ -31,20 +27,8 @@ namespace PCG
                 data.GetVertices(vertices);
             }
 
-            resultX = new NativeArray<float>(mesh.vertexCount, Allocator.TempJob);
-            resultY = new NativeArray<float>(mesh.vertexCount, Allocator.TempJob);
-            resultZ = new NativeArray<float>(mesh.vertexCount, Allocator.TempJob);
-
-
-            VerticesToPointsJob jobData = new VerticesToPointsJob
-            {
-                count = mesh.vertices.Length,
-                vertices = vertices,
-                resultX = resultX,
-                resultY = resultY,
-                resultZ = resultZ
-            };
-            handle = jobData.Schedule();
+            PCGEmptyJob emptyJob = new PCGEmptyJob();
+            handle = emptyJob.Schedule();
 
             return handle;
         }
@@ -55,33 +39,9 @@ namespace PCG
 
             points = new PCGPointData(mesh.vertices.Length);
 
-            /*points.SetAttributeList(DefaultAttributes.PosX, resultX.ToArray());
-            points.SetAttributeList(DefaultAttributes.PosY, resultY.ToArray());
-            points.SetAttributeList(DefaultAttributes.PosZ, resultZ.ToArray());*/
+            points.SetAttributeList(DefaultAttributes.Pos, vertices.ToArray());
 
             vertices.Dispose();
-            resultX.Dispose();
-            resultY.Dispose();
-            resultZ.Dispose();
-        }
-
-        struct VerticesToPointsJob : IJob
-        {
-            public int count;
-            public NativeArray<Vector3> vertices;
-            public NativeArray<float> resultX;
-            public NativeArray<float> resultY;
-            public NativeArray<float> resultZ;
-
-            public void Execute()
-            {
-                for(int i = 0; i < count; i++)
-                {
-                    resultX[i] = vertices[i].x;
-                    resultY[i] = vertices[i].y;
-                    resultZ[i] = vertices[i].z;
-                }
-            }
         }
     }
 }
