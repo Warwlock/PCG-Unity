@@ -82,9 +82,18 @@ namespace PCG
                 result = floatArray
             };
 
-            JobHandle flattenJobAHandle = flattenJobA.Schedule(dependsOn);
+            return flattenJobA.Schedule(dependsOn);
+        }
 
-            return flattenJobAHandle;
+        public JobHandle CreateCombineVector3Job(JobHandle dependsOn = default)
+        {
+            CombineVector3Job combineResult = new CombineVector3Job
+            {
+                count = floatArray.Length / 3,
+                array = floatArray,
+                result = vector3Array
+            };
+            return combineResult.Schedule(dependsOn);
         }
 
         public void Dispose()

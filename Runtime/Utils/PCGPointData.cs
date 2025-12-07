@@ -153,6 +153,8 @@ namespace PCG
             else
                 stripAxis = 0;
 
+            if (name.Split('.').First() == DefaultAttributes.LastModifiedAttribute)
+                name = lastModifiedAttribute;
 
             return name.Split('.').First();
         }

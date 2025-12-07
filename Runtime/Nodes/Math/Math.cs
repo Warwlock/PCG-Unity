@@ -71,22 +71,16 @@ namespace PCG
 
         JobHandle MathJobCreator(JobHandle dependsOn)
         {
-            int axesA = 1;
-            int axesB = 1;
+            int axesA = result.collectionType == typeof(Vector3) ? 3 : 1;
+            int axesB = inPoint.collectionType == typeof(Vector3) ? 3 : 1;
 
             JobHandle flattenJobAHandle = dependsOn;
             if (result.collectionType == typeof(Vector3))
-            {
                 flattenJobAHandle = result.CreateFlattenVector3Job(dependsOn);
-                axesA = 3;
-            }
 
             JobHandle flattenJobBHandle = dependsOn;
             if (inPoint.collectionType == typeof(Vector3))
-            {
                 flattenJobBHandle = inPoint.CreateFlattenVector3Job(flattenJobAHandle);
-                axesB = 3;
-            }
 
             MathJob jobData = new MathJob
             {
@@ -101,15 +95,7 @@ namespace PCG
             JobHandle jobDataHandle = jobData.Schedule(flattenJobBHandle);
 
             if (result.collectionType == typeof(Vector3))
-            {
-                CombineVector3Job combineResult = new CombineVector3Job
-                {
-                    count = pointsA.Count,
-                    array = result.floatArray,
-                    result = result.vector3Array
-                };
-                jobDataHandle = combineResult.Schedule(jobDataHandle);
-            }
+                jobDataHandle = result.CreateCombineVector3Job(jobDataHandle);
 
             return jobDataHandle;
         }
