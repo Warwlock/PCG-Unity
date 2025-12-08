@@ -33,18 +33,7 @@ namespace PCG
         {
             inputPorts.PullDatas();
 
-            if (CheckNull(pointsA)) return emptyHandle;
-            if (CheckNull(pointsB)) return emptyHandle;
-
-            if (pointsA.Count < pointsB.Count)
-            {
-                throw new Exception($"Mismatch between the number of points from pointsB[{pointsB.Count}] and pointsA[{pointsA.Count}]");
-            }
-
-            if(pointsA.GetDataType(attributeA) != pointsB.GetDataType(attributeB))
-            {
-                throw new Exception($"Mismatch between the types from pointsB[{pointsB.Count}] and pointsA[{pointsA.Count}]");
-            }
+            HandleCouplePointErrors(pointsA, pointsB, attributeA, attributeB);
 
             result = new NativeArrayCollection(pointsA, attributeA);
             inPoint = new NativeArrayCollection(pointsB, attributeB);
