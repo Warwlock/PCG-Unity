@@ -73,27 +73,58 @@ namespace PCG
 
         public JobHandle CreateFlattenVector3Job(JobHandle dependsOn = default)
         {
-            floatArray = new NativeArray<float>(vector3Array.Length * 3, Allocator.TempJob);
-
-            FlattenVector3Job flattenJobA = new FlattenVector3Job
+            if (stripAxis == 0)
             {
-                count = vector3Array.Length,
-                vector = vector3Array,
-                result = floatArray
-            };
+                floatArray = new NativeArray<float>(vector3Array.Length * 3, Allocator.TempJob);
 
-            return flattenJobA.Schedule(dependsOn);
+                FlattenVector3Job flattenJobA = new FlattenVector3Job
+                {
+                    count = vector3Array.Length,
+                    vector = vector3Array,
+                    result = floatArray
+                };
+
+                return flattenJobA.Schedule(dependsOn);
+            }
+            else
+            {
+                floatArray = new NativeArray<float>(vector3Array.Length, Allocator.TempJob);
+
+                SeparateVector3Job flattenJobA = new SeparateVector3Job
+                {
+                    count = vector3Array.Length,
+                    axis = stripAxis,
+                    vector = vector3Array,
+                    result = floatArray
+                };
+
+                return flattenJobA.Schedule(dependsOn);
+            }
         }
 
-        public JobHandle CreateCombineVector3Job(JobHandle dependsOn = default)
+        public JobHandle CreateUnflattenVector3Job(JobHandle dependsOn = default)
         {
-            UnflattenVector3Job combineResult = new UnflattenVector3Job
+            if (stripAxis == 0)
             {
-                count = floatArray.Length / 3,
-                array = floatArray,
-                result = vector3Array
-            };
-            return combineResult.Schedule(dependsOn);
+                UnflattenVector3Job combineResult = new UnflattenVector3Job
+                {
+                    count = floatArray.Length / 3,
+                    array = floatArray,
+                    result = vector3Array
+                };
+                return combineResult.Schedule(dependsOn);
+            }
+            else
+            {
+                CombineVector3Job combineResult = new CombineVector3Job
+                {
+                    count = floatArray.Length,
+                    axis = stripAxis,
+                    array = floatArray,
+                    result = vector3Array
+                };
+                return combineResult.Schedule(dependsOn);
+            }
         }
 
         public void SetPointAttributeList(PCGPointData points, string attribute)

@@ -66,7 +66,7 @@ namespace PCG
             JobHandle jobDataHandle = jobData.Schedule(flattenJobHandle);
 
             if (result.collectionType == typeof(Vector3))
-                jobDataHandle = result.CreateCombineVector3Job(jobDataHandle);
+                jobDataHandle = result.CreateUnflattenVector3Job(jobDataHandle);
 
             return jobDataHandle;
         }

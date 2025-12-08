@@ -21,6 +21,27 @@ namespace PCG
         }
     }
 
+    struct UnflattenVector3Job : IJob
+    {
+        public int count;
+        public NativeArray<float> array;
+        public NativeArray<Vector3> result;
+
+        public void Execute()
+        {
+            for(int i = 0; i < count; i++)
+            {
+                Vector3 vector = new Vector3();
+
+                vector.x = array[i];
+                vector.y = array[count + i];
+                vector.z = array[count * 2 + i];
+
+                result[i] = vector;
+            }
+        }
+    }
+
     struct SeparateVector3Job : IJob
     {
         public int count;
@@ -42,21 +63,24 @@ namespace PCG
         }
     }
 
-    struct UnflattenVector3Job : IJob
+    struct CombineVector3Job : IJob
     {
         public int count;
+        public int axis;
         public NativeArray<float> array;
         public NativeArray<Vector3> result;
 
-        public void Execute()
+        public void Execute() // There is a better way but I felt lazy to write
         {
-            for(int i = 0; i < count; i++)
+            for (int i = 0; i < count; i++)
             {
-                Vector3 vector = new Vector3();
-
-                vector.x = array[i];
-                vector.y = array[count + i];
-                vector.z = array[count * 2 + i];
+                Vector3 vector = result[i];
+                if (axis == 1)
+                    vector.x = array[i];
+                else if (axis == 2)
+                    vector.y = array[i];
+                else if (axis == 3)
+                    vector.z = array[i];
 
                 result[i] = vector;
             }
