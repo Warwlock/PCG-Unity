@@ -52,23 +52,19 @@ namespace PCG
 
         JobHandle JobCreator(JobHandle dependsOn = default)
         {
-            JobHandle flattenJobHandle = dependsOn;
-            if (result.collectionType == typeof(Vector3))
-                flattenJobHandle = result.CreateFlattenVector3Job(dependsOn);
+            dependsOn = result.CreateFlattenVector3Job(dependsOn);
 
             TrigonometryMathJob jobData = new TrigonometryMathJob
             {
                 mathFunctions = (int)mathFunctions,
                 countA = result.floatArray.Length,
-                stripAxis = result.stripAxis,
                 result = result.floatArray
             };
-            JobHandle jobDataHandle = jobData.Schedule(flattenJobHandle);
+            dependsOn = jobData.Schedule(dependsOn);
 
-            if (result.collectionType == typeof(Vector3))
-                jobDataHandle = result.CreateUnflattenVector3Job(jobDataHandle);
+            dependsOn = result.CreateUnflattenVector3Job(dependsOn);
 
-            return jobDataHandle;
+            return dependsOn;
         }
     }
 }

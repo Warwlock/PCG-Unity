@@ -38,7 +38,7 @@ namespace PCG
             result = new NativeArrayCollection(pointsA, attributeA);
             inPoint = new NativeArrayCollection(pointsB, attributeB);
 
-            handle = MathJobCreator(handle);
+            handle = JobCreator(handle);
 
             return handle;
         }
@@ -54,35 +54,24 @@ namespace PCG
             inPoint.Dispose();
         }
 
-        JobHandle MathJobCreator(JobHandle dependsOn)
+        JobHandle JobCreator(JobHandle dependsOn)
         {
-            int axesA = result.collectionType == typeof(Vector3) ? 3 : 1;
-            int axesB = inPoint.collectionType == typeof(Vector3) ? 3 : 1;
-
-            JobHandle flattenJobAHandle = dependsOn;
-            if (result.collectionType == typeof(Vector3))
-                flattenJobAHandle = result.CreateFlattenVector3Job(dependsOn);
-
-            JobHandle flattenJobBHandle = dependsOn;
-            if (inPoint.collectionType == typeof(Vector3))
-                flattenJobBHandle = inPoint.CreateFlattenVector3Job(flattenJobAHandle);
+            dependsOn = result.CreateFlattenVector3Job(dependsOn);
+            dependsOn = inPoint.CreateFlattenVector3Job(dependsOn);
 
             MathJob jobData = new MathJob
             {
                 mathFunctions = (int)mathFunctions,
-                countA = pointsA.Count,
-                countB = pointsB.Count,
-                MultiplierA = result.stripAxis > 0 ? -result.stripAxis : axesA, // Support one axis (.X) (negative) and dimensions (1-3 axis) (positive)
-                MultiplierB = inPoint.stripAxis > 0 ? -inPoint.stripAxis : axesB,
+                countA = result.floatArray.Length,
+                countB = inPoint.floatArray.Length,
                 inPoint = inPoint.floatArray,
                 result = result.floatArray
             };
-            JobHandle jobDataHandle = jobData.Schedule(flattenJobBHandle);
+            dependsOn = jobData.Schedule(dependsOn);
 
-            if (result.collectionType == typeof(Vector3))
-                jobDataHandle = result.CreateUnflattenVector3Job(jobDataHandle);
+            dependsOn = result.CreateUnflattenVector3Job(dependsOn);
 
-            return jobDataHandle;
+            return dependsOn;
         }
     }
 }

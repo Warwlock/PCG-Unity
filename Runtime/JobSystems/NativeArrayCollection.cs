@@ -73,6 +73,9 @@ namespace PCG
 
         public JobHandle CreateFlattenVector3Job(JobHandle dependsOn = default)
         {
+            if (collectionType != typeof(Vector3))
+                return dependsOn;
+
             if (stripAxis == 0)
             {
                 floatArray = new NativeArray<float>(vector3Array.Length * 3, Allocator.TempJob);
@@ -104,6 +107,9 @@ namespace PCG
 
         public JobHandle CreateUnflattenVector3Job(JobHandle dependsOn = default)
         {
+            if (collectionType != typeof(Vector3))
+                return dependsOn;
+
             if (stripAxis == 0)
             {
                 UnflattenVector3Job combineResult = new UnflattenVector3Job
