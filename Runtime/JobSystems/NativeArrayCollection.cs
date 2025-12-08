@@ -87,13 +87,23 @@ namespace PCG
 
         public JobHandle CreateCombineVector3Job(JobHandle dependsOn = default)
         {
-            CombineVector3Job combineResult = new CombineVector3Job
+            UnflattenVector3Job combineResult = new UnflattenVector3Job
             {
                 count = floatArray.Length / 3,
                 array = floatArray,
                 result = vector3Array
             };
             return combineResult.Schedule(dependsOn);
+        }
+
+        public void SetPointAttributeList(PCGPointData points, string attribute)
+        {
+            if (collectionType == typeof(Vector3))
+                points.SetAttributeList(attribute, vector3Array.ToArray());
+            if (collectionType == typeof(float))
+                points.SetAttributeList(attribute, floatArray.ToArray());
+            if (collectionType == typeof(int))
+                points.SetAttributeList(attribute, intArray.ToArray());
         }
 
         public void Dispose()

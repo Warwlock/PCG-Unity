@@ -42,7 +42,7 @@ namespace PCG
         }
     }
 
-    struct CombineVector3Job : IJob
+    struct UnflattenVector3Job : IJob
     {
         public int count;
         public NativeArray<float> array;

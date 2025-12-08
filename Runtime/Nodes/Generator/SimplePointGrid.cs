@@ -38,7 +38,7 @@ namespace PCG
                 grid = grid
             };
 
-            CombineVector3Job combineJob = new CombineVector3Job
+            UnflattenVector3Job combineJob = new UnflattenVector3Job
             {
                 count = XPoints * YPoints,
                 array = grid,

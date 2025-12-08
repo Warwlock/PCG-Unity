@@ -47,4 +47,29 @@ namespace PCG
             }
         }
     }
+
+    struct TrigonometryMathJob : IJob
+    {
+        public int mathFunctions;
+        public int countA;
+        public int stripAxis;
+        public NativeArray<float> result;
+
+        public void Execute()
+        {
+            int strip = stripAxis == 0 ? 0 : (stripAxis - 1) * (countA / 3);
+            int maxCount = stripAxis == 0 ? countA : countA / 3;
+
+            for (int a = 0; a < maxCount; a++)
+            {
+                int index = strip + a;
+                if (mathFunctions == 0) result[index] = math.sin(result[index]);
+                if (mathFunctions == 1) result[index] = math.cos(result[index]);
+                if (mathFunctions == 2) result[index] = math.tan(result[index]);
+                if (mathFunctions == 4) result[index] = math.asin(result[index]);
+                if (mathFunctions == 5) result[index] = math.acos(result[index]);
+                if (mathFunctions == 6) result[index] = math.atan(result[index]);
+            }
+        }
+    }
 }

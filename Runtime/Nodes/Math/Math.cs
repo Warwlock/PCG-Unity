@@ -48,11 +48,7 @@ namespace PCG
             handle.Complete();
 
             points = new PCGPointData(pointsA);
-
-            if (result.collectionType == typeof(Vector3))
-                points.SetAttributeList(attributeOut, result.vector3Array.ToArray());
-            if(result.collectionType == typeof(float))
-                points.SetAttributeList(attributeOut, result.floatArray.ToArray());
+            result.SetPointAttributeList(points, attributeOut);
 
             result.Dispose();
             inPoint.Dispose();
