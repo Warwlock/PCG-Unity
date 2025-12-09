@@ -16,11 +16,7 @@ namespace PCG
         [Input]
         public PCGPointData pointsA;
 
-        //[Input]
-        //public PCGPointData pointsB;
-
         public string attributeA = DefaultAttributes.LastModifiedAttribute;
-        //public string attributeB = DefaultAttributes.LastModifiedAttribute;
         public string attributeOut = DefaultAttributes.LastModifiedAttribute;
 
         [Output]
@@ -32,7 +28,7 @@ namespace PCG
         {
             inputPorts.PullDatas();
 
-            HandlePointErrors(pointsA);
+            if (HandlePointErrors(pointsA)) return emptyHandle;
             result = new NativeArrayCollection(pointsA, attributeA);
 
             handle = JobCreator(handle);

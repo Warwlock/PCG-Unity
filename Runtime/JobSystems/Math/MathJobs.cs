@@ -55,4 +55,42 @@ namespace PCG
             }
         }
     }
+
+    struct ComparisonMathJob : IJob
+    {
+        public int mathFunctions;
+        public int countA;
+        public int countB;
+        public NativeArray<float> inPoint;
+        public NativeArray<float> result;
+
+        public void Execute()
+        {
+            for (int a = 0; a < countA; a++)
+            {
+                var index = a % countB;
+                if (mathFunctions == 0) result[a] = math.min(result[a], inPoint[index]);
+                if (mathFunctions == 1) result[a] = math.max(result[a], inPoint[index]);
+                if (mathFunctions == 2) result[a] = result[a] < inPoint[index] ? 1f : 0f;
+                if (mathFunctions == 3) result[a] = result[a] > inPoint[index] ? 1f : 0f;
+            }
+        }
+    }
+
+    struct RoundingMathJob : IJob
+    {
+        public int mathFunctions;
+        public int countA;
+        public NativeArray<float> result;
+
+        public void Execute()
+        {
+            for (int a = 0; a < countA; a++)
+            {
+                if (mathFunctions == 0) result[a] = math.round(result[a]);
+                if (mathFunctions == 1) result[a] = math.floor(result[a]);
+                if (mathFunctions == 2) result[a] = math.ceil(result[a]);
+            }
+        }
+    }
 }

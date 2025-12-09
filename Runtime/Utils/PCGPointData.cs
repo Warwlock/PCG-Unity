@@ -11,8 +11,6 @@ namespace PCG
     {
         void Init(int count);
         IAttributeBuffer Clone();
-        //void Resize(int newSize);
-        //void Copy(int sourceIndex, int destIndex);
         System.Type GetDataType();
     }
 
@@ -110,6 +108,13 @@ namespace PCG
         public string[] GetAttributeNames()
         {
             return _attributes.Keys.ToArray();
+        }
+
+        public bool IsEmpty()
+        {
+            if (_attributes == null)
+                return true;
+            return _attributes.Count == 0;
         }
 
         public Type GetDataType(string name)

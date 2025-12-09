@@ -27,7 +27,7 @@ namespace PCG
         {
             inputPorts.PullDatas();
 
-            if (CheckNull(pointsIn)) return emptyHandle;
+            if (HandlePointErrors(pointsIn)) return emptyHandle;
 
             result = new NativeArray<float>(pointsIn.GetAttributeList<float>(attributeName), Allocator.TempJob);
 

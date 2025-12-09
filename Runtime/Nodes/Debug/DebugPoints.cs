@@ -18,7 +18,18 @@ namespace PCG
         {
             (graph as PCGGraph).debugPointsCount += points.Count;
 
-            for(int i = 0; i < points.Count; i++)
+            if (points == null)
+            {
+                Debug.LogError("Points null!");
+                return;
+            }
+            else if (points.IsEmpty())
+            {
+                Debug.LogError("Points empty!");
+                return;
+            }
+
+            for (int i = 0; i < points.Count; i++)
             {
                 Vector3 pos = new Vector3();
                 pos = points.GetAttribute<Vector3>(DefaultAttributes.Pos, i);

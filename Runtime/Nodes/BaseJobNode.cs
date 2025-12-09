@@ -10,9 +10,6 @@ namespace PCG
     public abstract class BaseJobNode : BaseNode
     {
         public JobHandle handle;
-
-        [HideInInspector]
-        public string errorString;
         public abstract JobHandle OnStartJobProcess();
         public static JobHandle emptyHandle = new JobHandle();
 
@@ -25,39 +22,45 @@ namespace PCG
             outputPorts.PushDatas();
         }
 
-        protected bool CheckNull(object property)
+        protected bool HandlePointErrors(PCGPointData points)
         {
-            if(property == null)
+            ClearMessages();
+            if (points == null)
             {
-                errorString = $"Some of ports didn't connected";
-                Debug.LogError(errorString);
+                AddMessage("Points null!", NodeMessageType.Error);
+                return true;
+            }
+            else if (points.IsEmpty())
+            {
+                AddMessage("Points empty!", NodeMessageType.Error);
                 return true;
             }
             return false;
         }
 
-        protected void HandlePointErrors(PCGPointData points)
+        protected bool HandleCouplePointErrors(PCGPointData pointsA, PCGPointData pointsB, string attributeA, string attributeB)
         {
-            if(points == null)
-            {
-                throw new Exception("Points are null!");
-            }
-        }
+            if (HandlePointErrors(pointsA)) return true;
+            if (HandlePointErrors(pointsB)) return true;
 
-        protected void HandleCouplePointErrors(PCGPointData pointsA, PCGPointData pointsB, string attributeA, string attributeB)
-        {
-            HandlePointErrors(pointsA);
-            HandlePointErrors(pointsB);
-
+            ClearMessages();
             if (pointsA.Count < pointsB.Count)
             {
-                throw new Exception($"Mismatch between the number of points from pointsB[{pointsB.Count}] and pointsA[{pointsA.Count}]");
+                string message = $"Mismatch between the number of points from pointsB[{ pointsB.Count}] and pointsA[{ pointsA.Count}]";
+                AddMessage(message, NodeMessageType.Error);
+                return true;
+                //throw new Exception(message);
             }
 
             if (pointsA.GetDataType(attributeA) != pointsB.GetDataType(attributeB))
             {
-                throw new Exception($"Mismatch between the types from pointsB[{pointsB.Count}] and pointsA[{pointsA.Count}]");
+                string message = $"Mismatch between the types from pointsB[{pointsB.Count}] and pointsA[{pointsA.Count}]";
+                AddMessage(message, NodeMessageType.Error);
+                return true;
+                //throw new Exception(message);
             }
+
+            return false;
         }
             
     }

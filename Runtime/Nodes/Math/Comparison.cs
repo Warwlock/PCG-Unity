@@ -26,32 +26,19 @@ namespace PCG
         [Output]
         public PCGPointData points;
 
-        public NativeArray<float> inPoint;
-        public NativeArray<float> result;
+        public NativeArrayCollection result;  // Points A
+        public NativeArrayCollection inPoint; // Points B
 
         public override JobHandle OnStartJobProcess()
         {
             inputPorts.PullDatas();
 
-            if (CheckNull(pointsA)) return emptyHandle;
-            if (CheckNull(pointsB)) return emptyHandle;
+            if (HandleCouplePointErrors(pointsA, pointsB, attributeA, attributeB)) return emptyHandle;
 
-            if (pointsA.Count < pointsB.Count)
-            {
-                throw new Exception($"Mismatch between the number of points from pointsB[{pointsB.Count}] and pointsA[{pointsA.Count}]");
-            }
+            result = new NativeArrayCollection(pointsA, attributeA);
+            inPoint = new NativeArrayCollection(pointsB, attributeB);
 
-            inPoint = new NativeArray<float>(pointsB.GetAttributeList<float>(attributeB), Allocator.TempJob);
-            result = new NativeArray<float>(pointsA.GetAttributeList<float>(attributeA), Allocator.TempJob);
-            MathJob jobData = new MathJob
-            {
-                mathFunctions = (int)mathFunctions,
-                countA = pointsA.Count,
-                countB = pointsB.Count,
-                inPoint = inPoint,
-                result = result
-            };
-            handle = jobData.Schedule();
+            handle = JobCreator(handle);
 
             return handle;
         }
@@ -61,32 +48,30 @@ namespace PCG
             handle.Complete();
 
             points = new PCGPointData(pointsA);
-
-            points.SetAttributeList(attributeOut, result.ToArray());
+            result.SetPointAttributeList(points, attributeOut);
 
             result.Dispose();
             inPoint.Dispose();
         }
 
-        struct MathJob : IJob
+        JobHandle JobCreator(JobHandle dependsOn)
         {
-            public int mathFunctions;
-            public int countA;
-            public int countB;
-            public NativeArray<float> inPoint;
-            public NativeArray<float> result;
+            dependsOn = result.CreateFlattenVector3Job(dependsOn);
+            dependsOn = inPoint.CreateFlattenVector3Job(dependsOn);
 
-            public void Execute()
+            ComparisonMathJob jobData = new ComparisonMathJob
             {
-                for (int a = 0; a < countA; a++)
-                {
-                    var index = a % countB;
-                    if (mathFunctions == 0) result[a] = math.min(result[a], inPoint[index]);
-                    if (mathFunctions == 1) result[a] = math.max(result[a], inPoint[index]);
-                    if (mathFunctions == 2) result[a] = result[a] < inPoint[index] ? 1f : 0f;
-                    if (mathFunctions == 3) result[a] = result[a] > inPoint[index] ? 1f : 0f;
-                }
-            }
+                mathFunctions = (int)mathFunctions,
+                countA = result.floatArray.Length,
+                countB = inPoint.floatArray.Length,
+                inPoint = inPoint.floatArray,
+                result = result.floatArray
+            };
+            dependsOn = jobData.Schedule(dependsOn);
+
+            dependsOn = result.CreateUnflattenVector3Job(dependsOn);
+
+            return dependsOn;
         }
     }
 }

@@ -18,10 +18,6 @@ namespace PCG.Editor
             var node = nodeTarget as BaseJobNode;
 
             base.Enable();
-
-            /*var errorLabel = new Label(node.errorString);
-
-            controlsContainer.Add(errorLabel);*/
         }
     }
 }
