@@ -2,6 +2,7 @@ using GraphProcessor;
 using NUnit.Framework;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Unity.Collections;
 using UnityEngine;
 
@@ -53,5 +54,10 @@ namespace PCG
         public event Action OnStart;
 
         public event Action OnUpdate;
+
+        public BasePCGNode GetDebugAttributeNode()
+        {
+            return nodes.Where(x => (x as BasePCGNode).debugAttribute).FirstOrDefault() as BasePCGNode;
+        }
     }
 }

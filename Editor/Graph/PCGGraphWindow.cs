@@ -43,5 +43,10 @@ namespace PCG.Editor
 
             rootView.Add(graphView);
         }
+
+        protected override void InitializeGraphView(BaseGraphView view)
+        {
+            view.OpenPinned<ExposedParameterView>();
+        }
     }
 }

@@ -1,9 +1,43 @@
 using GraphProcessor;
+using UnityEngine;
 
 namespace PCG
 {
     public abstract class BasePCGNode : BaseNode
     {
+        [HideInInspector]
+        public bool debugAttribute;
+
+        public void EnableAttributeDebug(bool currentBool)
+        {
+            foreach (var node in graph.nodes)
+            {
+                node.RemoveMessage("Attribute Debug");
+                (node as BasePCGNode).debugAttribute = false;
+            }
+            
+            debugAttribute = !currentBool;
+
+            if (debugAttribute)
+                AddMessage("Attribute Debug", NodeMessageType.Info);
+        }
+
+        public void OnOpen()
+        {
+            debugAttribute = false;
+        }
+
+        protected bool HandleNullErrors(bool isNull)
+        {
+            ClearMessages();
+            if (isNull)
+            {
+                AddMessage("Input object is null!", NodeMessageType.Error);
+                return true;
+            }
+            return false;
+        }
+
         protected bool HandlePointErrors(PCGPointData points)
         {
             ClearMessages();

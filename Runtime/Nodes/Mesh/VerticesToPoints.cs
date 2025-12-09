@@ -20,6 +20,8 @@ namespace PCG
         {
             inputPorts.PullDatas();
 
+            if (HandleNullErrors(mesh == null)) return emptyHandle;
+
             using(var dataArray = Mesh.AcquireReadOnlyMeshData(mesh))
             {
                 var data = dataArray[0];

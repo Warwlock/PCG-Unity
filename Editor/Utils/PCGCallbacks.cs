@@ -8,7 +8,6 @@ using UnityEngine;
 
 namespace PCG.Editor
 {
-
     public class PCGCallbacks
     {
         public static readonly string Extension = "asset";
