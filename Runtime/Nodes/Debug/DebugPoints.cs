@@ -6,7 +6,7 @@ using Unity.Collections;
 namespace PCG
 {
     [System.Serializable, NodeMenuItem("Debug/DebugPoints", typeof(PCGGraph))]
-    public class DebugPoints : BaseNode
+    public class DebugPoints : BasePCGNode
     {
         [SerializeField]
         public float pointSize = 0.1f;
@@ -18,16 +18,7 @@ namespace PCG
         {
             (graph as PCGGraph).debugPointsCount += points.Count;
 
-            if (points == null)
-            {
-                Debug.LogError("Points null!");
-                return;
-            }
-            else if (points.IsEmpty())
-            {
-                Debug.LogError("Points empty!");
-                return;
-            }
+            if (HandlePointErrors(points)) return;
 
             for (int i = 0; i < points.Count; i++)
             {
