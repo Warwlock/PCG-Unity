@@ -73,7 +73,6 @@ namespace PCG.Editor
             {
                 if(field.FieldType == typeof(PCGPointData))
                 {
-                    Debug.Log((field.GetValue(node) as PCGPointData).Count);
                     newFields.Add(field);
                 }
             }
@@ -111,7 +110,6 @@ namespace PCG.Editor
         void RefreshListView(FieldInfo field)
         {
             pointData = field.GetValue(node) as PCGPointData;
-            Debug.Log(pointData.Count);
             listView.itemsSource = new bool[pointData.Count];
 
             listView.columns.Clear();
