@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using UnityEditor;
 using UnityEditor.UIElements;
 using UnityEngine;
@@ -15,7 +16,11 @@ namespace PCG.Editor
         BasePCGNode currentNode;
 
         MultiColumnListView listView;
+        Toolbar toolbar;
         ToolbarButton nodeNameButton;
+
+        List<FieldInfo> newFields = new List<FieldInfo>();
+        PCGPointData pointData;
 
         public static void CreateWindow(PCGGraph graph)
         {
@@ -31,32 +36,11 @@ namespace PCG.Editor
 
         void CreateGUI()
         {
-            /*if (graph == null) return;
-
-            var node = graph.GetDebugAttributeNode();
-
-            if (node == null)
-            {
-                root.Add(new Label("Enable attribute debug for any node"));
-            }
-            else
-            {
-                root.Add(new Label("YES"));
-            }*/
-
             VisualElement root = rootVisualElement;
-
-            //root.Add(new IMGUIContainer(DrawImGUIToolbar));
-
             
-            root.Add(DrawToolbar());
-
-            //var scrollView = new ScrollView(ScrollViewMode.VerticalAndHorizontal);
+            root.Add(AddToolbar());
 
             listView = new MultiColumnListView();
-
-            listView.columns.Add(new Column() { title = "Index"});
-            listView.columns[0].bindCell = (element, index) => (element as Label).text = index.ToString();
 
             root.Add(listView);
         }
@@ -64,6 +48,8 @@ namespace PCG.Editor
         private void Update()
         {
             if (graph == null) return;
+
+            if (!graph.readyForDebugRender) return;
 
             node = graph.GetDebugAttributeNode();
 
@@ -79,42 +65,75 @@ namespace PCG.Editor
                 return;
             }
 
-            listView.itemsSource = new bool[(node as Math).pointsA.Count];
+            var fields = node.GetNodeFields();
+            if (fields == null) return;
 
-            listView.columns.Clear();
-            listView.columns.Add(new Column() { title = "Index" });
-            listView.columns[0].bindCell = (element, index) => (element as Label).text = index.ToString();
-            foreach (var key in (node as Math).pointsA.Attributes.Keys)
+            newFields.Clear();
+            foreach (var field in fields)
             {
-                listView.columns.Add(new Column() { title = key });
+                if(field.FieldType == typeof(PCGPointData))
+                {
+                    Debug.Log((field.GetValue(node) as PCGPointData).Count);
+                    newFields.Add(field);
+                }
             }
-            listView.Rebuild();
-
-            //listView.RefreshItems();
-
-            //VisualElement root = rootVisualElement;
-            //root.Clear();
-
-            //root.Add(new IMGUIContainer(DrawImGUIToolbar));
-
-            /*if (node == null)
-            {
-                root.Add(new Label("Enable attribute debug for any node"));
-            }
-            else
-            {
-                root.Add(new Label(node.GetType().ToString()));
-            }*/
+            RefreshToolbar();
+            RefreshListView(newFields[0]);
         }
 
-        VisualElement DrawToolbar()
+        VisualElement AddToolbar()
         {
-            var toolbar = new Toolbar();
+            toolbar = new Toolbar();
             nodeNameButton = new ToolbarButton();
             nodeNameButton.text = node?.name ?? "Null";
             toolbar.Add(nodeNameButton);
 
             return toolbar;
+        }
+
+        void RefreshToolbar()
+        {
+            toolbar.Clear();
+            nodeNameButton = new ToolbarButton();
+            nodeNameButton.text = node?.name ?? "Null";
+            toolbar.Add(nodeNameButton);
+
+            toolbar.Add(new ToolbarSpacer());
+
+            foreach (var field in newFields)
+            {
+                var portButton = new ToolbarButton() { text = field.Name };
+                portButton.clicked += () => { RefreshListView(field); };
+                toolbar.Add(portButton);
+            }
+        }
+
+        void RefreshListView(FieldInfo field)
+        {
+            pointData = field.GetValue(node) as PCGPointData;
+            Debug.Log(pointData.Count);
+            listView.itemsSource = new bool[pointData.Count];
+
+            listView.columns.Clear();
+            listView.columns.Add(new Column() { title = "Index", width = 60 });
+            listView.columns[0].bindCell = (element, index) => (element as Label).text = index.ToString();
+
+            if (pointData.Attributes == null)
+            {
+                Debug.LogWarning("Process graph one time to view attribute data!");
+                return;
+            }
+
+            foreach (var attribute in pointData.Attributes)
+            {
+                listView.columns.Add(new Column()
+                {
+                    title = attribute.Key + $"({attribute.Value.GetDataType().Name})",
+                    width = 120,
+                    bindCell = (element, index) => (element as Label).text = pointData.GetAttributeObject(attribute.Key, index)?.ToString() ?? "NULL"
+                });
+            }
+            listView.Rebuild();
         }
     }
 }

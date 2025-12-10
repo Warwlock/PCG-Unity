@@ -12,6 +12,7 @@ namespace PCG
         void Init(int count);
         IAttributeBuffer Clone();
         System.Type GetDataType();
+        object GetValue(int index);
     }
 
     public class AttributeBuffer<T> : IAttributeBuffer
@@ -31,6 +32,11 @@ namespace PCG
             buffer.Data = (T[])Data.Clone();
             return buffer;
         }
+
+        public object GetValue(int index)
+        {
+            return Data[index];
+        }
     }
 
     [Serializable]
@@ -41,7 +47,7 @@ namespace PCG
         public Dictionary<string, IAttributeBuffer> Attributes { get { return _attributes; } }
         //private Dictionary<string, Type> _attributeTypes = new();
 
-        public int Count;// { get; private set; }
+        public int Count { get; private set; }
         public string lastModifiedAttribute;
         public bool requiresStripping = false;
         public int stripAxis = 0;
@@ -104,6 +110,15 @@ namespace PCG
                 _attributes.Add(name, buffer1);
             }
             lastModifiedAttribute = name;
+        }
+
+        public object GetAttributeObject(string name, int index)
+        {
+            if (_attributes.TryGetValue(name, out var buffer))
+            {
+                return buffer.GetValue(index);
+            }
+            return null;
         }
 
 

@@ -15,6 +15,7 @@ namespace PCG
 
         public void OnEndJobProcess()
         {
+            debugAttribute = false;
             ExceptionToLog.Call(() => Process());
 
             InvokeOnProcessed();
