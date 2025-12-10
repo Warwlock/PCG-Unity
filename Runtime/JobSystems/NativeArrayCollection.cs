@@ -12,24 +12,30 @@ namespace PCG
         public NativeArray<int> intArray;
 
         public int stripAxis = 0;
+        public int Count = 0;
+        public int dimension = 1;
 
         public Type collectionType { get; set; }
 
         public NativeArrayCollection(Type arrayType, int arrayLength)
         {
             collectionType = arrayType;
+            Count = arrayLength;
 
-            if(arrayType == typeof(float))
+            if (arrayType == typeof(float))
             {
                 floatArray = new NativeArray<float>(arrayLength, Allocator.TempJob);
+                dimension = 1;
             }
             if (arrayType == typeof(Vector3))
             {
                 vector3Array = new NativeArray<Vector3>(arrayLength, Allocator.TempJob);
+                dimension = 3;
             }
             if (arrayType == typeof(int))
             {
                 intArray = new NativeArray<int>(arrayLength, Allocator.TempJob);
+                dimension = 1;
             }
         }
 
@@ -37,18 +43,22 @@ namespace PCG
         {
             collectionType = pointData.GetDataType(attributeName);
             stripAxis = pointData.stripAxis;
+            Count = pointData.Count;
 
             if (collectionType == typeof(float))
             {
                 floatArray = new NativeArray<float>(arrayLength, Allocator.TempJob);
+                dimension = 1;
             }
             if (collectionType == typeof(Vector3))
             {
                 vector3Array = new NativeArray<Vector3>(arrayLength, Allocator.TempJob);
+                dimension = 3;
             }
             if (collectionType == typeof(int))
             {
                 intArray = new NativeArray<int>(arrayLength, Allocator.TempJob);
+                dimension = 1;
             }
         }
 
@@ -56,18 +66,22 @@ namespace PCG
         {
             collectionType = pointData.GetDataType(attributeName);
             stripAxis = pointData.stripAxis;
+            Count = pointData.Count;
 
             if (collectionType == typeof(float))
             {
                 floatArray = new NativeArray<float>(pointData.GetAttributeList<float>(attributeName), Allocator.TempJob);
+                dimension = 1;
             }
             if (collectionType == typeof(Vector3))
             {
                 vector3Array = new NativeArray<Vector3>(pointData.GetAttributeList<Vector3>(attributeName), Allocator.TempJob);
+                dimension = 3;
             }
             if (collectionType == typeof(int))
             {
                 intArray = new NativeArray<int>(pointData.GetAttributeList<int>(attributeName), Allocator.TempJob);
+                dimension = 1;
             }
         }
 
@@ -92,6 +106,7 @@ namespace PCG
             else
             {
                 floatArray = new NativeArray<float>(vector3Array.Length, Allocator.TempJob);
+                dimension = 1;
 
                 SeparateVector3Job flattenJobA = new SeparateVector3Job
                 {

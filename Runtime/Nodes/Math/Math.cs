@@ -62,8 +62,10 @@ namespace PCG
             MathJob jobData = new MathJob
             {
                 mathFunctions = (int)mathFunctions,
-                countA = result.floatArray.Length,
-                countB = inPoint.floatArray.Length,
+                countA = result.Count,
+                countB = inPoint.Count,
+                dimensionA = result.dimension,
+                dimensionB = inPoint.dimension,
                 inPoint = inPoint.floatArray,
                 result = result.floatArray
             };

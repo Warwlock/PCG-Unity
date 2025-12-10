@@ -54,7 +54,7 @@ namespace PCG
             return false;
         }
 
-        protected bool HandleCouplePointErrors(PCGPointData pointsA, PCGPointData pointsB, string attributeA, string attributeB)
+        protected bool HandleCouplePointErrors(PCGPointData pointsA, PCGPointData pointsB, string attributeA, string attributeB, bool supportFloatVectorCouple = false)
         {
             if (HandlePointErrors(pointsA)) return true;
             if (HandlePointErrors(pointsB)) return true;
@@ -65,15 +65,20 @@ namespace PCG
                 string message = $"Mismatch between the number of points from pointsB[{ pointsB.Count}] and pointsA[{ pointsA.Count}]";
                 AddMessage(message, NodeMessageType.Error);
                 return true;
-                //throw new Exception(message);
             }
 
             if (pointsA.GetDataType(attributeA) != pointsB.GetDataType(attributeB))
             {
-                string message = $"Mismatch between the types from pointsB[{pointsB.Count}] and pointsA[{pointsA.Count}]";
-                AddMessage(message, NodeMessageType.Error);
-                return true;
-                //throw new Exception(message);
+                if (pointsB.GetDataType(attributeB) == typeof(float) && 
+                    (pointsA.GetDataType(attributeA) == typeof(Vector3) ||
+                    pointsA.GetDataType(attributeA) == typeof(Vector2) ||
+                    pointsA.GetDataType(attributeA) == typeof(Quaternion))) { Debug.Log("Supported float-vector"); }
+                else 
+                {
+                    string message = $"Mismatch between the types from pointsB[{pointsB.Count}] and pointsA[{pointsA.Count}]";
+                    AddMessage(message, NodeMessageType.Error);
+                    return true;
+                }
             }
 
             return false;
