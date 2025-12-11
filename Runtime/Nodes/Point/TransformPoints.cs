@@ -37,15 +37,17 @@ namespace PCG
 
             if (HandlePointErrors(pointsIn)) return emptyHandle;
 
-            pointsIn.CreateAttribute(DefaultAttributes.Pos, Vector3.zero);
-            pointsIn.CreateAttribute(DefaultAttributes.Rot, Vector3.zero);
-            pointsIn.CreateAttribute(DefaultAttributes.Sca, Vector3.one);
-            pointsIn.CreateAttribute(DefaultAttributes.Density, 0f);
+            points = new PCGPointData(pointsIn);
 
-            resultPos = new NativeArray<Vector3>(pointsIn.GetAttributeList<Vector3>(DefaultAttributes.Pos), Allocator.TempJob);
-            resultRot = new NativeArray<Vector3>(pointsIn.GetAttributeList<Vector3>(DefaultAttributes.Rot), Allocator.TempJob);
-            resultSca = new NativeArray<Vector3>(pointsIn.GetAttributeList<Vector3>(DefaultAttributes.Sca), Allocator.TempJob);
-            density = new NativeArray<float>(pointsIn.GetAttributeList<float>(DefaultAttributes.Density), Allocator.TempJob);
+            points.CreateAttribute(DefaultAttributes.Pos, Vector3.zero);
+            points.CreateAttribute(DefaultAttributes.Rot, Vector3.zero);
+            points.CreateAttribute(DefaultAttributes.Sca, Vector3.one);
+            points.CreateAttribute(DefaultAttributes.Density, 0f);
+
+            resultPos = new NativeArray<Vector3>(points.GetAttributeList<Vector3>(DefaultAttributes.Pos), Allocator.TempJob);
+            resultRot = new NativeArray<Vector3>(points.GetAttributeList<Vector3>(DefaultAttributes.Rot), Allocator.TempJob);
+            resultSca = new NativeArray<Vector3>(points.GetAttributeList<Vector3>(DefaultAttributes.Sca), Allocator.TempJob);
+            density = new NativeArray<float>(points.GetAttributeList<float>(DefaultAttributes.Density), Allocator.TempJob);
 
             handle = JobCreator(handle);
 
@@ -55,8 +57,6 @@ namespace PCG
         protected override void Process()
         {
             handle.Complete();
-
-            points = new PCGPointData(pointsIn);
 
             points.SetAttributeList(DefaultAttributes.Pos, resultPos.ToArray());
             points.SetAttributeList(DefaultAttributes.Rot, resultRot.ToArray());

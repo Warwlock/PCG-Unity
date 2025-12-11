@@ -62,6 +62,7 @@ namespace PCG.Editor
 
             if (node == null)
             {
+                RefreshToolbar(true);
                 listView.itemsSource = null;
                 return;
             }
@@ -77,7 +78,7 @@ namespace PCG.Editor
                     newFields.Add(field);
                 }
             }
-            RefreshToolbar();
+            RefreshToolbar(false);
             RefreshListView(newFields[0]);
         }
 
@@ -91,11 +92,12 @@ namespace PCG.Editor
             return toolbar;
         }
 
-        void RefreshToolbar()
+        void RefreshToolbar(bool clean)
         {
             toolbar.Clear();
             nodeNameButton = new ToolbarButton();
             nodeNameButton.text = node?.name ?? "Null";
+            if (clean) { toolbar.Add(nodeNameButton); return; }
             nodeNameButton.clicked += () => {
                 graphView.ClearSelection();
                 graphView.AddToSelection(graphView.nodeViewsPerNode.GetValueOrDefault(node));
