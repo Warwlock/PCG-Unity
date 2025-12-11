@@ -23,11 +23,16 @@ namespace PCG
             for (int i = 0; i < points.Count; i++)
             {
                 Vector3 pos = new Vector3();
+                Quaternion rot = new Quaternion();
+                Vector3 sca = new Vector3();
+
                 pos = points.GetAttribute<Vector3>(DefaultAttributes.Pos, i);
+                rot = Quaternion.Euler(points.GetAttribute<Vector3>(DefaultAttributes.Rot, i));
+                sca = points.GetAttribute<Vector3>(DefaultAttributes.Sca, i);
 
                 float density = points.GetAttribute<float>(DefaultAttributes.Density, i);
 
-                Matrix4x4 posMatrix = Matrix4x4.TRS(pos, Quaternion.identity, Vector3.one * pointSize);
+                Matrix4x4 posMatrix = Matrix4x4.TRS(pos, rot, sca * pointSize);
 
                 (graph as PCGGraph).debugPointMatrices.Add(posMatrix);
                 (graph as PCGGraph).debugPointDensities.Add(density);

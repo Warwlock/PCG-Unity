@@ -69,7 +69,7 @@ namespace PCG
 
             if (pointsA.GetDataType(attributeA) != pointsB.GetDataType(attributeB))
             {
-                if (pointsB.GetDataType(attributeB) == typeof(float) && 
+                if (supportFloatVectorCouple && pointsB.GetDataType(attributeB) == typeof(float) && 
                     (pointsA.GetDataType(attributeA) == typeof(Vector3) ||
                     pointsA.GetDataType(attributeA) == typeof(Vector2) ||
                     pointsA.GetDataType(attributeA) == typeof(Quaternion))) { Debug.Log("Supported float-vector"); }

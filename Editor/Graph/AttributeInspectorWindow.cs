@@ -10,6 +10,7 @@ namespace PCG.Editor
 {
     public class AttributeInspectorWindow : EditorWindow
     {
+        public PCGGraphView graphView;
         public PCGGraph graph;
         public BasePCGNode node;
 
@@ -22,16 +23,16 @@ namespace PCG.Editor
         List<FieldInfo> newFields = new List<FieldInfo>();
         PCGPointData pointData;
 
-        public static void CreateWindow(PCGGraph graph)
+        public static void CreateWindow(PCGGraphView graphView)
         {
             AttributeInspectorWindow window = GetWindow<AttributeInspectorWindow>("Attribute Inspector", true, typeof(PCGGraphWindow));
-            Debug.Log(graph);
-            window.Init(graph);
+            window.Init(graphView);
         }
 
-        public void Init(PCGGraph graph)
+        public void Init(PCGGraphView graphView)
         {
-            this.graph = graph;
+            this.graphView = graphView;
+            graph = graphView.graph as PCGGraph;
         }
 
         void CreateGUI()
@@ -53,7 +54,7 @@ namespace PCG.Editor
 
             node = graph.GetDebugAttributeNode();
 
-            if(currentNode == node)
+            if (currentNode == node)
                 return;
             currentNode = node;
 
@@ -95,6 +96,11 @@ namespace PCG.Editor
             toolbar.Clear();
             nodeNameButton = new ToolbarButton();
             nodeNameButton.text = node?.name ?? "Null";
+            nodeNameButton.clicked += () => {
+                graphView.ClearSelection();
+                graphView.AddToSelection(graphView.nodeViewsPerNode.GetValueOrDefault(node));
+                graphView.FrameSelection();
+            };
             toolbar.Add(nodeNameButton);
 
             toolbar.Add(new ToolbarSpacer());

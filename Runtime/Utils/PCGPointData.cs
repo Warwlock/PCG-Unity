@@ -70,7 +70,8 @@ namespace PCG
             if (_attributes.ContainsKey(name)) return;
 
             var buffer = new AttributeBuffer<T>();
-            for (int i = 0; i < Count; i++) buffer.Data[i] = defaultValue;
+            buffer.Data = new T[Count];
+            Array.Fill(buffer.Data, defaultValue);
 
             _attributes.Add(name, buffer);
         }

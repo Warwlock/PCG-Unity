@@ -10,6 +10,7 @@ namespace PCG.Editor
         protected override void KeyDownCallback(KeyDownEvent e)
         {
             base.KeyDownCallback(e);
+
             if (e.keyCode == KeyCode.W)
             {
                 if (selection.Count == 1)
@@ -19,7 +20,7 @@ namespace PCG.Editor
                 }
             }
 
-            if (e.keyCode == KeyCode.D)
+            if (e.keyCode == KeyCode.E)
             {
                 if (selection.Count == 1)
                 {

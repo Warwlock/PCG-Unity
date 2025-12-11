@@ -16,7 +16,7 @@ namespace PCG.Editor
         {
             AddButton("Save Gaph", () => { EditorUtility.SetDirty(graphView.graph); AssetDatabase.SaveAssets(); });
 
-            AddButton("Open Attribute Inspector", () => { AttributeInspectorWindow.CreateWindow(graphView.graph as PCGGraph); });
+            AddButton("Open Attribute Inspector", () => { AttributeInspectorWindow.CreateWindow(graphView as PCGGraphView); });
 
             bool exposedParamsVisible = graphView.GetPinnedElementStatus<ExposedParameterView>() != DropdownMenuAction.Status.Hidden;
             showParameters = AddToggle("Show Parameters", exposedParamsVisible, (v) => graphView.ToggleView<ExposedParameterView>());
