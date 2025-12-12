@@ -52,12 +52,15 @@ using Float = System.Single;
 using Util = NoiseDotNet.ScalarUtil;
 using Unity.Burst;
 using Unity.Mathematics;
+using static Unity.Mathematics.math;
 using Unity.Jobs;
 using Unity.Collections.LowLevel.Unsafe;
 #endif
 
 using System.Runtime.CompilerServices;
 using System;
+using Unity.Collections;
+using UnityEngine.UIElements;
 
 namespace NoiseDotNet
 {
@@ -597,7 +600,7 @@ namespace NoiseDotNet
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        static Float GradientNoise3DVector(Float x, Float y, Float z, Int seed)
+        internal static Float GradientNoise3DVector(Float x, Float y, Float z, Int seed)
         {
             Float xFloor = Util.Floor(x);
             Float yFloor = Util.Floor(y);
@@ -777,7 +780,7 @@ namespace NoiseDotNet
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        static (Float centerDist, Float edgeDist) CellularNoise3DVector(Float x, Float y, Float z, Int seed)
+        internal static (Float centerDist, Float edgeDist) CellularNoise3DVector(Float x, Float y, Float z, Int seed)
         {
             Float xFloor = Util.Floor(x);
             Float yFloor = Util.Floor(y);
@@ -916,7 +919,100 @@ namespace NoiseDotNet
 
 #if UNITY
 
+
+
     public enum NoiseType { GradientNoise2D, GradientNoise3D, CellularNoise2D, CellularNoise3D}
+
+    [BurstCompile(CompileSynchronously = true, FloatMode = FloatMode.Fast, FloatPrecision = FloatPrecision.Low)]
+    public struct NativeArrayNoiseJob : IJob
+    {
+        public NoiseType noiseType;
+        public int seed;
+        public int octaves;
+        public float xFrequency, yFrequency, zFrequency;
+        public float amplitude1, amplitude2;
+        public float lacunarity, persistence;
+
+        public NativeArray<float> xBuffer, yBuffer, zBuffer, output1Buffer, output2Buffer;
+
+        /*[NoAlias]
+        [NativeDisableUnsafePtrRestriction]
+        public float* xBuffer, yBuffer, zBuffer, output1Buffer, output2Buffer;
+        public int length;*/
+
+        public void Execute()
+        {
+            if (octaves == 1)
+            {
+                if (noiseType == NoiseType.GradientNoise3D)
+                {
+                    for (int i = 0; i < xBuffer.Length; i++)
+                    {
+                        output1Buffer[i] = (Noise.GradientNoise3DVector(xBuffer[i] * xFrequency, yBuffer[i] * yFrequency, zBuffer[i] * zFrequency, seed) * amplitude1 + 1) * 0.5f;
+                    }
+                }
+                if (noiseType == NoiseType.CellularNoise3D)
+                {
+                    for (int i = 0; i < xBuffer.Length; i++)
+                    {
+                        (float centerDist, float edgeDist) = Noise.CellularNoise3DVector(xBuffer[i] * xFrequency, yBuffer[i] * yFrequency, zBuffer[i] * zFrequency, seed);
+                        output1Buffer[i] = (centerDist * amplitude1 + 1) * 0.5f; // CenterDist
+                        output2Buffer[i] = (edgeDist * amplitude2 + 1) * 0.5f; // EdgeDist
+                    }
+                }
+            }
+            else
+            {
+                if (noiseType == NoiseType.GradientNoise3D)
+                {
+                    for (int i = 0; i < xBuffer.Length; i++)
+                    {
+                        float amplitudeA = amplitude1;
+                        float3 frequency = new float3(xFrequency, yFrequency, zFrequency);
+                        float total = 0.0f;
+                        float maxAmplitudeA = 0.0f;
+
+                        for (int octave = 0; octave < octaves; octave++)
+                        {
+                            total += Noise.GradientNoise3DVector(xBuffer[i] * frequency.x, yBuffer[i] * frequency.y, zBuffer[i] * frequency.z, seed) * amplitudeA;
+                            maxAmplitudeA += amplitudeA;
+                            frequency *= lacunarity;
+                            amplitudeA *= persistence;
+                        }
+                        output1Buffer[i] = (total / maxAmplitudeA + 1) * 0.5f;
+                    }
+                }
+                if (noiseType == NoiseType.CellularNoise3D)
+                {
+                    for (int i = 0; i < xBuffer.Length; i++)
+                    {
+                        float amplitudeA = amplitude1;
+                        float amplitudeB = amplitude2;
+                        float3 frequency = new float3(xFrequency, yFrequency, zFrequency);
+                        float totalA = 0.0f;
+                        float totalB = 0.0f;
+                        float maxAmplitudeA = 0.0f;
+                        float maxAmplitudeB = 0.0f;
+
+                        for (int octave = 0; octave < octaves; octave++)
+                        {
+                            (float centerDist, float edgeDist) = Noise.CellularNoise3DVector(xBuffer[i] * frequency.x, yBuffer[i] * frequency.y, zBuffer[i] * frequency.z, seed);
+                            totalA += (centerDist * amplitudeA + 1) * 0.5f; // CenterDist
+                            totalB += (edgeDist * amplitudeB + 1) * 0.5f; // EdgeDist
+
+                            maxAmplitudeA += amplitudeA;
+                            maxAmplitudeB += amplitudeB;
+                            frequency *= lacunarity;
+                            amplitudeA *= persistence;
+                            amplitudeB *= persistence;
+                        }
+                        output1Buffer[i] = (totalA / maxAmplitudeA + 1) * 0.5f;
+                        output2Buffer[i] = (totalB / maxAmplitudeB + 1) * 0.5f;
+                    }
+                }
+            }
+        }
+    }
 
     /// <summary>
     /// Burst Job for evaluating noise functions from the <see cref="Noise"/> class.

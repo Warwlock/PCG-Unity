@@ -63,6 +63,24 @@ namespace PCG
         }
     }
 
+    struct SeparateAllVector3Job : IJob
+    {
+        public NativeArray<Vector3> array;
+        public NativeArray<float> x;
+        public NativeArray<float> y;
+        public NativeArray<float> z;
+
+        public void Execute()
+        {
+            for (int i = 0; i < array.Length; i++)
+            {
+                x[i] = array[i].x;
+                y[i] = array[i].y;
+                z[i] = array[i].z;
+            }
+        }
+    }
+
     struct CombineVector3Job : IJob
     {
         public int count;
@@ -87,6 +105,7 @@ namespace PCG
         }
     }
 
+    // ------------------------ Vector2 Jobs ------------------------
     struct FlattenVector2Job : IJob
     {
         public int count;

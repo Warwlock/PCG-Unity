@@ -10,14 +10,15 @@ namespace PCG
 {
     public class PCGGraph : BaseGraph
     {
-        public int graphSeed;
+        public int seed { get; set; }
         [SerializeField] public Mesh debugMesh = null;
         [SerializeField] public Material debugMaterial = null;
 
         public GraphicsBuffer _densityBuffer;
+        public MaterialPropertyBlock _matProps;
 
-        [HideInInspector] public List<Matrix4x4> debugPointMatrices = new();
-        [HideInInspector] public List<float> debugPointDensities = new();
+        public List<Matrix4x4> debugPointMatrices = new();
+        public List<float> debugPointDensities = new();
         public int debugPointsCount;
         [HideInInspector] public bool readyForDebugRender;
 
@@ -32,6 +33,7 @@ namespace PCG
 
         public void CreateDebugPoints()
         {
+            _matProps = new MaterialPropertyBlock();
             _densityBuffer = new GraphicsBuffer(GraphicsBuffer.Target.Structured, debugPointsCount, sizeof(float));
             readyForDebugRender = true;
         }

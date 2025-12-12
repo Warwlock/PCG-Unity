@@ -87,13 +87,13 @@ namespace PCG
             return null;
         }
 
-        public T GetAttribute<T>(string name, int pointIndex)
+        public T GetAttribute<T>(string name, int pointIndex, T defaultValue = default)
         {
             if (_attributes.TryGetValue(name, out var buffer))
             {
                 return ((AttributeBuffer<T>)buffer).Data[pointIndex];
             }
-            return default;
+            return defaultValue;
         }
 
         public void SetAttributeList<T>(string name, T[] value)

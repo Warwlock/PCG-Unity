@@ -28,5 +28,10 @@ namespace PCG
         {
             Mean, Median, Sum, Min, Max, Range, StdDev, Variance
         }
+
+        public enum NoiseFunctions
+        {
+            RandomNoise, PerlinNoise, CellularNoise
+        }
     }
 }

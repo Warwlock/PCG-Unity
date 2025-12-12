@@ -28,7 +28,7 @@ namespace PCG
 
                 pos = points.GetAttribute<Vector3>(DefaultAttributes.Pos, i);
                 rot = Quaternion.Euler(points.GetAttribute<Vector3>(DefaultAttributes.Rot, i));
-                sca = points.GetAttribute<Vector3>(DefaultAttributes.Sca, i);
+                sca = points.GetAttribute(DefaultAttributes.Sca, i, Vector3.one);
 
                 float density = points.GetAttribute<float>(DefaultAttributes.Density, i);
 
