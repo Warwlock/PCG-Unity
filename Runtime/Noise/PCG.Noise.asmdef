@@ -1,14 +1,13 @@
 {
-    "name": "PCG-Unity.runtime",
+    "name": "PCG.Noise",
     "rootNamespace": "",
     "references": [
-        "GUID:ca937d03ee5dd4d699091438dc0f3ae6",
         "GUID:d8b63aba1907145bea998dd612889d6b",
-        "GUID:e42d50928d5457449a445df2aa25447c"
+        "GUID:2665a8d13d1b3f18800f46e256720795"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],
-    "allowUnsafeCode": false,
+    "allowUnsafeCode": true,
     "overrideReferences": false,
     "precompiledReferences": [],
     "autoReferenced": true,

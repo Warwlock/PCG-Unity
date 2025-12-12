@@ -10,6 +10,7 @@ namespace PCG
     {
         public PCGGraph pcgGraph;
         public bool processGraph = false;
+        public int seed = 42;
 
         void Start()
         {
@@ -22,6 +23,7 @@ namespace PCG
             if (processGraph)
             {
                 processGraph = false;
+                pcgGraph.graphSeed = seed;
                 pcgGraph.ClearDebugPoints();
                 pcgGraph.CallOnStart();
                 StartCoroutine(ProcessGraphCoroutine(pcgGraph));

@@ -10,6 +10,7 @@ namespace PCG
 {
     public class PCGGraph : BaseGraph
     {
+        public int graphSeed;
         [SerializeField] public Mesh debugMesh = null;
         [SerializeField] public Material debugMaterial = null;
 
