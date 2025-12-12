@@ -1,6 +1,7 @@
 using UnityEngine;
 using Unity.Mathematics;
 using Unity.Jobs;
+using NoiseDotNet;
 
 namespace PCG
 {

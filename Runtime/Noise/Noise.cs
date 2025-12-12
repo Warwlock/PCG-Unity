@@ -137,10 +137,10 @@ namespace NoiseDotNet
         /// <param name="yFreq">y-coordinates are multiplied by this number before being used.</param>
         /// <param name="amplitude">The output of the noise function is multiplied by this number before being written into the output buffer.</param>
         /// <param name="seed">The seed for the noise function.</param>
-        public static unsafe void GradientNoise2D(ReadOnlySpan<float> xCoords, ReadOnlySpan<float> yCoords, Span<float> output, float xFreq, float yFreq, float amplitude, int seed)
+        public static unsafe JobHandle GradientNoise2D(ReadOnlySpan<float> xCoords, ReadOnlySpan<float> yCoords, Span<float> output, float xFreq, float yFreq, float amplitude, int seed, JobHandle dependsOn = default)
         {
             // RunJob handles input validation
-            BurstNoiseJob.RunGradientNoise2DJob(xCoords, yCoords, output, xFreq, yFreq, amplitude, seed);
+            return BurstNoiseJob.RunGradientNoise2DJob(xCoords, yCoords, output, xFreq, yFreq, amplitude, seed, dependsOn);
         }
 
         /// <summary>
@@ -237,10 +237,10 @@ namespace NoiseDotNet
         /// <param name="zFreq">z-coordinates are multiplied by this number before being used.</param>
         /// <param name="amplitude">The output of the noise function is multiplied by this number before being written into the output buffer.</param>
         /// <param name="seed">The seed for the noise function.</param>
-        public static unsafe void GradientNoise3D(ReadOnlySpan<float> xCoords, ReadOnlySpan<float> yCoords, ReadOnlySpan<float> zCoords, Span<float> output, float xFreq, float yFreq, float zFreq, float amplitude, int seed)
+        public static unsafe JobHandle GradientNoise3D(ReadOnlySpan<float> xCoords, ReadOnlySpan<float> yCoords, ReadOnlySpan<float> zCoords, Span<float> output, float xFreq, float yFreq, float zFreq, float amplitude, int seed, JobHandle dependsOn = default)
         {
             // RunJob handles input validation
-            BurstNoiseJob.RunGradientNoise3DJob(xCoords, yCoords, zCoords, output, xFreq, yFreq, zFreq, amplitude, seed);
+            return BurstNoiseJob.RunGradientNoise3DJob(xCoords, yCoords, zCoords, output, xFreq, yFreq, zFreq, amplitude, seed, dependsOn);
         }
 
         /// <summary>
@@ -345,9 +345,9 @@ namespace NoiseDotNet
         /// <param name="centerDistAmplitude">Center distance outputs are multiplied by this number before being written into the output buffer.</param>
         /// <param name="edgeDistAmplitude">Edge distance outputs are multiplied by this number before being written into the output buffer.</param>
         /// <param name="seed">The seed for the noise function.</param>
-        public static unsafe void CellularNoise2D(ReadOnlySpan<float> xCoords, ReadOnlySpan<float> yCoords, Span<float> centerDistOutput, Span<float> edgeDistOutput, float xFreq, float yFreq, float centerDistAmplitude, float edgeDistAmplitude, int seed)
+        public static unsafe JobHandle CellularNoise2D(ReadOnlySpan<float> xCoords, ReadOnlySpan<float> yCoords, Span<float> centerDistOutput, Span<float> edgeDistOutput, float xFreq, float yFreq, float centerDistAmplitude, float edgeDistAmplitude, int seed, JobHandle dependsOn = default)
         {
-            BurstNoiseJob.RunCellularNoise2DJob(xCoords, yCoords, centerDistOutput, edgeDistOutput, xFreq, yFreq, centerDistAmplitude, edgeDistAmplitude, seed);
+            return BurstNoiseJob.RunCellularNoise2DJob(xCoords, yCoords, centerDistOutput, edgeDistOutput, xFreq, yFreq, centerDistAmplitude, edgeDistAmplitude, seed, dependsOn);
         }
 
         /// <summary>
@@ -466,10 +466,10 @@ namespace NoiseDotNet
         /// <param name="centerDistAmplitude">Center distance outputs are multiplied by this number before being written into the output buffer.</param>
         /// <param name="edgeDistAmplitude">Edge distance outputs are multiplied by this number before being written into the output buffer.</param>
         /// <param name="seed">The seed for the noise function.</param>
-        public static unsafe void CellularNoise3D(ReadOnlySpan<float> xCoords, ReadOnlySpan<float> yCoords, ReadOnlySpan<float> zCoords, Span<float> centerDistOutput, Span<float> edgeDistOutput, float xFreq, float yFreq, float zFreq, float centerDistAmplitude, float edgeDistAmplitude, int seed)
+        public static unsafe JobHandle CellularNoise3D(ReadOnlySpan<float> xCoords, ReadOnlySpan<float> yCoords, ReadOnlySpan<float> zCoords, Span<float> centerDistOutput, Span<float> edgeDistOutput, float xFreq, float yFreq, float zFreq, float centerDistAmplitude, float edgeDistAmplitude, int seed, JobHandle dependsOn = default)
         {
             // RunJob handles input validation
-            BurstNoiseJob.RunCellularNoise3DJob(xCoords, yCoords, zCoords, centerDistOutput, edgeDistOutput, xFreq, yFreq, zFreq, centerDistAmplitude, edgeDistAmplitude, seed);
+            return BurstNoiseJob.RunCellularNoise3DJob(xCoords, yCoords, zCoords, centerDistOutput, edgeDistOutput, xFreq, yFreq, zFreq, centerDistAmplitude, edgeDistAmplitude, seed, dependsOn);
         }
 
         /// <summary>
@@ -954,7 +954,7 @@ namespace NoiseDotNet
             }
         }
 
-        public static void RunGradientNoise2DJob(ReadOnlySpan<float> x, ReadOnlySpan<float> y, Span<float> output, float xFreq, float yFreq, float amplitude, int seed)
+        public static JobHandle RunGradientNoise2DJob(ReadOnlySpan<float> x, ReadOnlySpan<float> y, Span<float> output, float xFreq, float yFreq, float amplitude, int seed, JobHandle dependsOn)
         {
             if (output.Length == 0)
                 throw new ArgumentException($"Output buffer length was 0. Expected > 0.");
@@ -969,23 +969,25 @@ namespace NoiseDotNet
                 {
                     fixed (float* outPtr = output)
                     {
-                        BurstNoiseJob job = new();
-                        job.noiseType = NoiseType.GradientNoise2D;
-                        job.xBuffer = xPtr;
-                        job.yBuffer = yPtr;
-                        job.output1Buffer = outPtr;
-                        job.length = x.Length;
-                        job.amplitude1 = amplitude;
-                        job.xFrequency = xFreq;
-                        job.yFrequency = yFreq;
-                        job.seed = seed;
-                        job.Run();
+                        BurstNoiseJob job = new()
+                        {
+                            noiseType = NoiseType.GradientNoise2D,
+                            xBuffer = xPtr,
+                            yBuffer = yPtr,
+                            output1Buffer = outPtr,
+                            length = x.Length,
+                            amplitude1 = amplitude,
+                            xFrequency = xFreq,
+                            yFrequency = yFreq,
+                            seed = seed
+                        };
+                        return job.Schedule(dependsOn);
                     }
                 }
             }
         }
 
-        public static void RunGradientNoise3DJob(ReadOnlySpan<float> x, ReadOnlySpan<float> y, ReadOnlySpan<float> z, Span<float> output, float xFreq, float yFreq, float zFreq, float amplitude, int seed)
+        public static JobHandle RunGradientNoise3DJob(ReadOnlySpan<float> x, ReadOnlySpan<float> y, ReadOnlySpan<float> z, Span<float> output, float xFreq, float yFreq, float zFreq, float amplitude, int seed, JobHandle dependsOn)
         {
             if (output.Length == 0)
                 throw new ArgumentException($"Output buffer length was 0. Expected > 0.");
@@ -1004,26 +1006,28 @@ namespace NoiseDotNet
                     {
                         fixed (float* outPtr = output)
                         {
-                            BurstNoiseJob job = new();
-                            job.noiseType = NoiseType.GradientNoise3D;
-                            job.xBuffer = xPtr;
-                            job.yBuffer = yPtr;
-                            job.zBuffer = zPtr;
-                            job.output1Buffer = outPtr;
-                            job.length = x.Length;
-                            job.amplitude1 = amplitude;
-                            job.xFrequency = xFreq;
-                            job.yFrequency = yFreq;
-                            job.zFrequency = zFreq;
-                            job.seed = seed;
-                            job.Run();
+                            BurstNoiseJob job = new()
+                            {
+                                noiseType = NoiseType.GradientNoise3D,
+                                xBuffer = xPtr,
+                                yBuffer = yPtr,
+                                zBuffer = zPtr,
+                                output1Buffer = outPtr,
+                                length = x.Length,
+                                amplitude1 = amplitude,
+                                xFrequency = xFreq,
+                                yFrequency = yFreq,
+                                zFrequency = zFreq,
+                                seed = seed
+                            };
+                            return job.Schedule(dependsOn);
                         }
                     }
                 }
             }
         }
 
-        public static void RunCellularNoise2DJob(ReadOnlySpan<float> x, ReadOnlySpan<float> y, Span<float> centerDistOutput, Span<float> edgeDistOutput, float xFreq, float yFreq, float centerDistAmplitude, float edgeDistAmplitude, int seed)
+        public static JobHandle RunCellularNoise2DJob(ReadOnlySpan<float> x, ReadOnlySpan<float> y, Span<float> centerDistOutput, Span<float> edgeDistOutput, float xFreq, float yFreq, float centerDistAmplitude, float edgeDistAmplitude, int seed, JobHandle dependsOn)
         {
             if (centerDistOutput.Length != edgeDistOutput.Length)
                 throw new ArgumentException($"Expected center dist output buffer length {centerDistOutput.Length} to equal edge dist output buffer length {edgeDistOutput.Length}");
@@ -1043,26 +1047,28 @@ namespace NoiseDotNet
                         fixed (float* edgeOutPtr = edgeDistOutput)
                         {
 
-                            BurstNoiseJob job = new();
-                            job.noiseType = NoiseType.CellularNoise2D;
-                            job.xBuffer = xPtr;
-                            job.yBuffer = yPtr;
-                            job.output1Buffer = centerOutPtr;
-                            job.output2Buffer = edgeOutPtr;
-                            job.length = centerDistOutput.Length;
-                            job.amplitude1 = centerDistAmplitude;
-                            job.amplitude2 = edgeDistAmplitude;
-                            job.xFrequency = xFreq;
-                            job.yFrequency = yFreq;
-                            job.seed = seed;
-                            job.Run();
+                            BurstNoiseJob job = new()
+                            {
+                                noiseType = NoiseType.CellularNoise2D,
+                                xBuffer = xPtr,
+                                yBuffer = yPtr,
+                                output1Buffer = centerOutPtr,
+                                output2Buffer = edgeOutPtr,
+                                length = centerDistOutput.Length,
+                                amplitude1 = centerDistAmplitude,
+                                amplitude2 = edgeDistAmplitude,
+                                xFrequency = xFreq,
+                                yFrequency = yFreq,
+                                seed = seed
+                            };
+                            return job.Schedule(dependsOn);
                         }
                     }
                 }
             }
         }
 
-        public static void RunCellularNoise3DJob(ReadOnlySpan<float> x, ReadOnlySpan<float> y, ReadOnlySpan<float> z, Span<float> centerDistOutput, Span<float> edgeDistOutput, float xFreq, float yFreq, float zFreq, float centerDistAmplitude, float edgeDistAmplitude, int seed)
+        public static JobHandle RunCellularNoise3DJob(ReadOnlySpan<float> x, ReadOnlySpan<float> y, ReadOnlySpan<float> z, Span<float> centerDistOutput, Span<float> edgeDistOutput, float xFreq, float yFreq, float zFreq, float centerDistAmplitude, float edgeDistAmplitude, int seed, JobHandle dependsOn)
         {
             if (centerDistOutput.Length != edgeDistOutput.Length)
                 throw new ArgumentException($"Expected center dist output buffer length {centerDistOutput.Length} to equal edge dist output buffer length {edgeDistOutput.Length}");
@@ -1086,21 +1092,23 @@ namespace NoiseDotNet
                             fixed (float* edgeOutPtr = edgeDistOutput)
                             {
 
-                                BurstNoiseJob job = new();
-                                job.noiseType = NoiseType.CellularNoise3D;
-                                job.xBuffer = xPtr;
-                                job.yBuffer = yPtr;
-                                job.zBuffer = zPtr;
-                                job.output1Buffer = centerOutPtr;
-                                job.output2Buffer = edgeOutPtr;
-                                job.length = centerDistOutput.Length;
-                                job.amplitude1 = centerDistAmplitude;
-                                job.amplitude2 = edgeDistAmplitude;
-                                job.xFrequency = xFreq;
-                                job.yFrequency = yFreq;
-                                job.zFrequency = zFreq;
-                                job.seed = seed;
-                                job.Run();
+                                BurstNoiseJob job = new()
+                                {
+                                    noiseType = NoiseType.CellularNoise3D,
+                                    xBuffer = xPtr,
+                                    yBuffer = yPtr,
+                                    zBuffer = zPtr,
+                                    output1Buffer = centerOutPtr,
+                                    output2Buffer = edgeOutPtr,
+                                    length = centerDistOutput.Length,
+                                    amplitude1 = centerDistAmplitude,
+                                    amplitude2 = edgeDistAmplitude,
+                                    xFrequency = xFreq,
+                                    yFrequency = yFreq,
+                                    zFrequency = zFreq,
+                                    seed = seed
+                                };
+                                return job.Schedule(dependsOn);
                             }
                         }
                     }
