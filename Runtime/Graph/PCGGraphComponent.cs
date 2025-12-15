@@ -11,6 +11,7 @@ namespace PCG
         public PCGGraph pcgGraph;
         public bool processGraph = false;
         public int seed = 42;
+        public Material mat;
 
         void Start()
         {
@@ -23,6 +24,14 @@ namespace PCG
             if (processGraph)
             {
                 processGraph = false;
+                int count = transform.childCount;
+                for (int i = 0; i < count; i++)
+                {
+                    if(Application.isPlaying)
+                        Destroy(transform.GetChild(0).gameObject);
+                    else
+                        DestroyImmediate(transform.GetChild(0).gameObject);
+                }
                 pcgGraph.seed = seed;
                 pcgGraph.ClearDebugPoints();
                 pcgGraph.CallOnStart();
@@ -52,9 +61,11 @@ namespace PCG
         void CreateObject(Mesh mesh)
         {
             var obj = new GameObject();
+            obj.transform.parent = transform;
             var mf = obj.AddComponent<MeshFilter>();
-            obj.AddComponent<MeshRenderer>();
+            var mr = obj.AddComponent<MeshRenderer>();
 
+            mr.material = mat;
             mf.mesh = mesh;
         }
 
@@ -105,6 +116,11 @@ namespace PCG
                 {
                     node.OnProcess();
                 }
+            }
+
+            foreach(var mesh in pcgGraph.terrainMeshes)
+            {
+                CreateObject(mesh);
             }
 
             pcgGraph.CreateDebugPoints();
