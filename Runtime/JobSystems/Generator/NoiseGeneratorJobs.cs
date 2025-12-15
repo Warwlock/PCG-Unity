@@ -13,7 +13,7 @@ namespace PCG
 
         public void Execute()
         {
-            var random = new Unity.Mathematics.Random((uint)(100));
+            var random = new Unity.Mathematics.Random((uint)seed);
             for (int i = 0; i < result.Length; i++)
             {
                 result[i] = random.NextFloat();

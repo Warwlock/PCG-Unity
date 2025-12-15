@@ -49,6 +49,15 @@ namespace PCG
             }
         }
 
+        void CreateObject(Mesh mesh)
+        {
+            var obj = new GameObject();
+            var mf = obj.AddComponent<MeshFilter>();
+            obj.AddComponent<MeshRenderer>();
+
+            mf.mesh = mesh;
+        }
+
         IEnumerator ProcessGraphCoroutine(PCGGraph graph)
         {
             var sortedNodes = graph.nodes.Where(n => n.computeOrder >= 0).OrderBy(n => n.computeOrder).ToList();

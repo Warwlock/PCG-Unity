@@ -14,13 +14,17 @@ namespace PCG
         [SerializeField] public Mesh debugMesh = null;
         [SerializeField] public Material debugMaterial = null;
 
+        // Debug Fields
         public GraphicsBuffer _densityBuffer;
         public MaterialPropertyBlock _matProps;
 
-        public List<Matrix4x4> debugPointMatrices = new();
-        public List<float> debugPointDensities = new();
+        [HideInInspector] public List<Matrix4x4> debugPointMatrices = new();
+        [HideInInspector] public List<float> debugPointDensities = new();
         public int debugPointsCount;
         [HideInInspector] public bool readyForDebugRender;
+
+        // Mesh Fields
+        public List<Mesh> terrainMeshes;
 
         public void ClearDebugPoints()
         {
@@ -46,6 +50,7 @@ namespace PCG
 
         public void CallOnStart()
         {
+            terrainMeshes.Clear();
             OnStart?.Invoke();
         }
 
