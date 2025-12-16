@@ -2,6 +2,7 @@ using GraphProcessor;
 using Unity.Collections;
 using Unity.Jobs;
 using UnityEngine;
+using static PCG.MathOperators;
 
 namespace PCG
 {
@@ -9,7 +10,7 @@ namespace PCG
     public class ChunkedGridTerrain : BaseJobNode
     {
         [SerializeField]
-        public int pointsPerChunk = 10;
+        public ChunkSizeEnum chunkSize = ChunkSizeEnum._48;
         public int chunkX = 5, chunkY = 5;
         public float pointDst = 0.1f;
 
@@ -22,13 +23,13 @@ namespace PCG
         {
             inputPorts.PullDatas();
 
-            int totalPoints = (pointsPerChunk * chunkX) * (pointsPerChunk * chunkY);
+            int totalPoints = ((int)chunkSize * chunkX) * ((int)chunkSize * chunkY);
             result = new NativeArray<Vector3>(totalPoints, Allocator.TempJob);
 
             ChunkGridTerrainJob jobData = new ChunkGridTerrainJob
             {
-                numX = pointsPerChunk,
-                numY = pointsPerChunk,
+                numX = (int)chunkSize,
+                numY = (int)chunkSize,
                 chunkX = chunkX,
                 chunkY = chunkY,
                 pointDst = pointDst,
@@ -44,7 +45,7 @@ namespace PCG
         {
             handle.Complete();
 
-            int totalPoints = (pointsPerChunk * chunkX) * (pointsPerChunk * chunkY);
+            int totalPoints = ((int)chunkSize * chunkX) * ((int)chunkSize * chunkY);
             points = new PCGPointData(totalPoints);
 
             points.SetAttributeList(DefaultAttributes.Pos, result.ToArray());

@@ -4,6 +4,7 @@ using Unity.Collections;
 using Unity.Jobs;
 using UnityEngine;
 using UnityEngine.Rendering;
+using static PCG.MathOperators;
 using MeshDataArray = UnityEngine.Mesh.MeshDataArray;
 
 namespace PCG
@@ -12,8 +13,9 @@ namespace PCG
     public class PointsToTerrain : BaseJobNode
     {
         [SerializeField]
-        public int pointsPerChunk = 10;
+        public ChunkSizeEnum chunkSize = ChunkSizeEnum._48;
         public int chunkX = 5, chunkY = 5;
+        public float slope, bias;
 
         [Input]
         public PCGPointData pointsIn;
@@ -39,12 +41,10 @@ namespace PCG
 
             int totalChunks = chunkX * chunkY;
             Mesh[] meshes = new Mesh[totalChunks];
-            Debug.Log(meshes);
             for (int i = 0; i < meshes.Length; i++)
             {
                 meshes[i] = new Mesh();
                 meshes[i].name = "Chunk" + i;
-                Debug.Log(meshes[i]);
             }
             Mesh.ApplyAndDisposeWritableMeshData(meshDataArray, meshes);
             for (int i = 0; i < meshes.Length; i++)
@@ -61,10 +61,9 @@ namespace PCG
             meshDataArray = Mesh.AllocateWritableMeshData(totalChunks);
             List<JobHandle> dependencies = new List<JobHandle>();
 
+            int pointsPerChunk = (int)chunkSize;
             for (int i = 0; i < totalChunks; i++)
             {
-                Debug.Log(i);
-
                 int startIndex = i * pointsPerChunk * pointsPerChunk;
                 NativeSlice<Vector3> slice = new NativeSlice<Vector3>(pointPos, startIndex, pointsPerChunk * pointsPerChunk);
 
@@ -74,6 +73,8 @@ namespace PCG
                     numY = pointsPerChunk,
                     slice = slice,
                     meshData = meshDataArray[i],
+                    slope = slope,
+                    bias = bias
                 };
                 dependencies.Add(chunkMeshJob.Schedule());
             }
