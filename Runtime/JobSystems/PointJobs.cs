@@ -4,74 +4,81 @@ using UnityEngine;
 
 namespace PCG
 {
-    struct TranslatePointsJob : IJob
+    struct TranslatePointsJob : IJobFor
     {
-        public bool absolute;
         public Vector3 max;
         public Vector3 min;
         public NativeArray<Vector3> vector;
         public NativeArray<float> density;
 
-        public void Execute()
+        public void Execute(int i)
         {
-            if (absolute)
-                for (int i = 0; i < vector.Length; i++)
-                {
-                    vector[i] = Vector3.Lerp(min, max, density[i]);
-                }
-            else
-                for (int i = 0; i < vector.Length; i++)
-                {
-                    vector[i] += Vector3.Lerp(min, max, density[i]);
-                }
+            vector[i] += Vector3.Lerp(min, max, density[i]);
         }
     }
 
-    struct RotatePointsJob : IJob
+    struct TranslatePointsAbsoluteJob : IJobFor
     {
-        public bool absolute;
         public Vector3 max;
         public Vector3 min;
         public NativeArray<Vector3> vector;
         public NativeArray<float> density;
 
-        public void Execute()
+        public void Execute(int i)
         {
-            var maxRot = Quaternion.Euler(max);
-            var minRot = Quaternion.Euler(min);
-            if (absolute)
-                for (int i = 0; i < vector.Length; i++)
-                {
-                    vector[i] = Quaternion.Lerp(minRot, maxRot, density[i]).eulerAngles;
-                }
-            else
-                for (int i = 0; i < vector.Length; i++)
-                {
-                    vector[i] = (Quaternion.Euler(vector[i]) * Quaternion.Lerp(minRot, maxRot, density[i])).eulerAngles;
-                }
+            vector[i] = Vector3.Lerp(min, max, density[i]);
         }
     }
 
-    struct ScalePointsJob : IJob
+    struct RotatePointsJob : IJobFor
     {
-        public bool absolute;
+        public Quaternion max;
+        public Quaternion min;
+        public NativeArray<Vector3> vector;
+        public NativeArray<float> density;
+
+        public void Execute(int i)
+        {
+            vector[i] = (Quaternion.Euler(vector[i]) * Quaternion.Lerp(min, max, density[i])).eulerAngles;
+        }
+    }
+
+    struct RotatePointsAbsoluteJob : IJobFor
+    {
+        public Quaternion max;
+        public Quaternion min;
+        public NativeArray<Vector3> vector;
+        public NativeArray<float> density;
+
+        public void Execute(int i)
+        {
+            vector[i] = Quaternion.Lerp(min, max, density[i]).eulerAngles;
+        }
+    }
+
+    struct ScalePointsJob : IJobFor
+    {
         public Vector3 max;
         public Vector3 min;
         public NativeArray<Vector3> vector;
         public NativeArray<float> density;
 
-        public void Execute()
+        public void Execute(int i)
         {
-            if (absolute)
-                for (int i = 0; i < vector.Length; i++)
-                {
-                    vector[i] = Vector3.Lerp(min, max, density[i]);
-                }
-            else
-                for (int i = 0; i < vector.Length; i++)
-                {
-                    vector[i] = Vector3.Scale(vector[i], Vector3.Lerp(min, max, density[i]));
-                }
+            vector[i] = Vector3.Scale(vector[i], Vector3.Lerp(min, max, density[i]));
+        }
+    }
+
+    struct ScalePointsAbsoluteJob : IJobFor
+    {
+        public Vector3 max;
+        public Vector3 min;
+        public NativeArray<Vector3> vector;
+        public NativeArray<float> density;
+
+        public void Execute(int i)
+        {
+            vector[i] = Vector3.Lerp(min, max, density[i]);
         }
     }
 }

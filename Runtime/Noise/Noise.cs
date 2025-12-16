@@ -600,7 +600,7 @@ namespace NoiseDotNet
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        internal static Float GradientNoise3DVector(Float x, Float y, Float z, Int seed)
+        public static Float GradientNoise3DVector(Float x, Float y, Float z, Int seed)
         {
             Float xFloor = Util.Floor(x);
             Float yFloor = Util.Floor(y);
@@ -780,7 +780,7 @@ namespace NoiseDotNet
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        internal static (Float centerDist, Float edgeDist) CellularNoise3DVector(Float x, Float y, Float z, Int seed)
+        public static (Float centerDist, Float edgeDist) CellularNoise3DVector(Float x, Float y, Float z, Int seed)
         {
             Float xFloor = Util.Floor(x);
             Float yFloor = Util.Floor(y);
@@ -923,7 +923,7 @@ namespace NoiseDotNet
 
     public enum NoiseType { GradientNoise2D, GradientNoise3D, CellularNoise2D, CellularNoise3D}
 
-    [BurstCompile(CompileSynchronously = true, FloatMode = FloatMode.Fast, FloatPrecision = FloatPrecision.Low)]
+    [Obsolete]
     public struct NativeArrayNoiseJob : IJob
     {
         public NoiseType noiseType;
@@ -934,11 +934,6 @@ namespace NoiseDotNet
         public float lacunarity, persistence;
 
         public NativeArray<float> xBuffer, yBuffer, zBuffer, output1Buffer, output2Buffer;
-
-        /*[NoAlias]
-        [NativeDisableUnsafePtrRestriction]
-        public float* xBuffer, yBuffer, zBuffer, output1Buffer, output2Buffer;
-        public int length;*/
 
         public void Execute()
         {
@@ -1013,6 +1008,7 @@ namespace NoiseDotNet
             }
         }
     }
+    
 
     /// <summary>
     /// Burst Job for evaluating noise functions from the <see cref="Noise"/> class.

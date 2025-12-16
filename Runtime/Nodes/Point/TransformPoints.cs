@@ -70,35 +70,74 @@ namespace PCG
 
         JobHandle JobCreator(JobHandle dependsOn = default)
         {
-            TranslatePointsJob translateData = new TranslatePointsJob
+            if (AbsoluteOffset)
             {
-                absolute = AbsoluteOffset,
-                max = OffsetMax,
-                min = OffsetMin,
-                density = density,
-                vector = resultPos
-            };
-            dependsOn = translateData.Schedule(dependsOn);
+                TranslatePointsAbsoluteJob translateData = new TranslatePointsAbsoluteJob
+                {
+                    max = OffsetMax,
+                    min = OffsetMin,
+                    density = density,
+                    vector = resultPos
+                };
+                dependsOn = translateData.ScheduleParallelByRef(resultPos.Length, BATCH_COUNT, dependsOn);
+            }
+            else
+            {
+                TranslatePointsJob translateData = new TranslatePointsJob
+                {
+                    max = OffsetMax,
+                    min = OffsetMin,
+                    density = density,
+                    vector = resultPos
+                };
+                dependsOn = translateData.ScheduleParallelByRef(resultPos.Length, BATCH_COUNT, dependsOn);
+            }
 
-            RotatePointsJob rotateData = new RotatePointsJob
+            if (AbsoluteRotation)
             {
-                absolute = AbsoluteRotation,
-                max = RotationMax,
-                min = RotationMin,
-                density = density,
-                vector = resultRot
-            };
-            dependsOn = rotateData.Schedule(dependsOn);
+                RotatePointsAbsoluteJob rotateData = new RotatePointsAbsoluteJob
+                {
+                    max = Quaternion.Euler(RotationMax),
+                    min = Quaternion.Euler(RotationMin),
+                    density = density,
+                    vector = resultRot
+                };
+                dependsOn = rotateData.ScheduleParallelByRef(resultPos.Length, BATCH_COUNT, dependsOn);
+            }
+            else
+            {
+                RotatePointsJob rotateData = new RotatePointsJob
+                {
+                    max = Quaternion.Euler(RotationMax),
+                    min = Quaternion.Euler(RotationMin),
+                    density = density,
+                    vector = resultRot
+                };
+                dependsOn = rotateData.ScheduleParallelByRef(resultPos.Length, BATCH_COUNT, dependsOn);
+            }
 
-            ScalePointsJob scaleData = new ScalePointsJob
+            if (AbsoluteScale)
             {
-                absolute = AbsoluteScale,
-                max = ScaleMax,
-                min = ScaleMin,
-                density = density,
-                vector = resultSca
-            };
-            dependsOn = scaleData.Schedule(dependsOn);
+                ScalePointsAbsoluteJob scaleData = new ScalePointsAbsoluteJob
+                {
+                    max = ScaleMax,
+                    min = ScaleMin,
+                    density = density,
+                    vector = resultSca
+                };
+                dependsOn = scaleData.ScheduleParallelByRef(resultPos.Length, BATCH_COUNT, dependsOn);
+            }
+            else
+            {
+                ScalePointsJob scaleData = new ScalePointsJob
+                {
+                    max = ScaleMax,
+                    min = ScaleMin,
+                    density = density,
+                    vector = resultSca
+                };
+                dependsOn = scaleData.ScheduleParallelByRef(resultPos.Length, BATCH_COUNT, dependsOn);
+            }
 
             return dependsOn;
         }

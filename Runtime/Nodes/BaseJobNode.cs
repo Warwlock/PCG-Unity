@@ -13,6 +13,10 @@ namespace PCG
         public abstract JobHandle OnStartJobProcess();
         public static JobHandle emptyHandle = new JobHandle();
 
+        internal static int BATCH_COUNT = 64;
+
+        bool parallelJobs = false;
+
         public void OnEndJobProcess()
         {
             debugAttribute = false;
@@ -21,6 +25,6 @@ namespace PCG
             InvokeOnProcessed();
 
             outputPorts.PushDatas();
-        }            
+        }
     }
 }

@@ -1,9 +1,9 @@
 using GraphProcessor;
+using System;
 using Unity.Collections;
 using Unity.Jobs;
-using UnityEngine;
-using NoiseDotNet;
 using Unity.Mathematics;
+using UnityEngine;
 
 namespace PCG
 {
@@ -80,28 +80,43 @@ namespace PCG
                     y = y,
                     z = z
                 };
-                dependsOn = separateJob.Schedule(dependsOn);
+                dependsOn = separateJob.ScheduleParallel(pointsIn.Count, BATCH_COUNT, dependsOn);
 
-
-                NativeArrayNoiseJob noiseJob = new NativeArrayNoiseJob
+                if (octaves == 1)
                 {
-                    noiseType = NoiseType.GradientNoise3D,
-                    seed = (graph as PCGGraph).seed,
-                    xFrequency = frequency.x,
-                    yFrequency = frequency.y,
-                    zFrequency = frequency.z,
-                    amplitude1 = amplitude,
-                    amplitude2 = amplitude,
-                    lacunarity = lacunarity,
-                    persistence = gain,
-                    octaves = octaves,
-                    xBuffer = x,
-                    yBuffer = y,
-                    zBuffer = z,
-                    output1Buffer = result,
-                    output2Buffer = result1
-                };
-                dependsOn = noiseJob.Schedule(dependsOn);
+                    GradientNoise3DJob noiseJob = new GradientNoise3DJob
+                    {
+                        seed = (graph as PCGGraph).seed,
+                        xFrequency = frequency.x,
+                        yFrequency = frequency.y,
+                        zFrequency = frequency.z,
+                        amplitude = amplitude,
+                        xBuffer = x,
+                        yBuffer = y,
+                        zBuffer = z,
+                        outputBuffer = result
+                    };
+                    dependsOn = noiseJob.ScheduleParallel(pointsIn.Count, BATCH_COUNT, dependsOn);
+                }
+                else
+                {
+                    GradientNoise3DFractalJob noiseJob = new GradientNoise3DFractalJob
+                    {
+                        seed = (graph as PCGGraph).seed,
+                        xFrequency = frequency.x,
+                        yFrequency = frequency.y,
+                        zFrequency = frequency.z,
+                        amplitude = amplitude,
+                        lacunarity = lacunarity,
+                        persistence = gain,
+                        octaves = octaves,
+                        xBuffer = x,
+                        yBuffer = y,
+                        zBuffer = z,
+                        outputBuffer = result
+                    };
+                    dependsOn = noiseJob.ScheduleParallel(pointsIn.Count, BATCH_COUNT, dependsOn);
+                }
 
                 arrayPos.Dispose(dependsOn);
                 x.Dispose(dependsOn);
@@ -124,27 +139,47 @@ namespace PCG
                     y = y,
                     z = z
                 };
-                dependsOn = separateJob.Schedule(dependsOn);
+                dependsOn = separateJob.ScheduleParallel(pointsIn.Count, BATCH_COUNT, dependsOn);
 
-                NativeArrayNoiseJob noiseJob = new NativeArrayNoiseJob
+                if (octaves == 1)
                 {
-                    noiseType = NoiseType.CellularNoise3D,
-                    seed = (graph as PCGGraph).seed,
-                    xFrequency = frequency.x,
-                    yFrequency = frequency.y,
-                    zFrequency = frequency.z,
-                    amplitude1 = amplitude,
-                    amplitude2 = amplitude,
-                    lacunarity = lacunarity,
-                    persistence = gain,
-                    octaves = octaves,
-                    xBuffer = x,
-                    yBuffer = y,
-                    zBuffer = z,
-                    output1Buffer = result,
-                    output2Buffer = result1
-                };
-                dependsOn = noiseJob.Schedule(dependsOn);
+                    CellularNoise3DJob noiseJob = new CellularNoise3DJob
+                    {
+                        seed = (graph as PCGGraph).seed,
+                        xFrequency = frequency.x,
+                        yFrequency = frequency.y,
+                        zFrequency = frequency.z,
+                        amplitude1 = amplitude,
+                        amplitude2 = amplitude,
+                        xBuffer = x,
+                        yBuffer = y,
+                        zBuffer = z,
+                        output1Buffer = result,
+                        output2Buffer = result1
+                    };
+                    dependsOn = noiseJob.ScheduleParallelByRef(pointsIn.Count, BATCH_COUNT, dependsOn);
+                }
+                else
+                {
+                    CellularNoise3DFractalJob noiseJob = new CellularNoise3DFractalJob
+                    {
+                        seed = (graph as PCGGraph).seed,
+                        xFrequency = frequency.x,
+                        yFrequency = frequency.y,
+                        zFrequency = frequency.z,
+                        amplitude1 = amplitude,
+                        amplitude2 = amplitude,
+                        lacunarity = lacunarity,
+                        persistence = gain,
+                        octaves = octaves,
+                        xBuffer = x,
+                        yBuffer = y,
+                        zBuffer = z,
+                        output1Buffer = result,
+                        output2Buffer = result1
+                    };
+                    dependsOn = noiseJob.ScheduleParallelByRef(pointsIn.Count, BATCH_COUNT, dependsOn);
+                }
 
                 arrayPos.Dispose(dependsOn);
                 x.Dispose(dependsOn);
@@ -155,12 +190,13 @@ namespace PCG
             }
             else
             {
+                Debug.Log("RND");
                 RandomNoiseJob noiseJob = new RandomNoiseJob
                 {
-                    seed = (graph as PCGGraph).seed,
+                    random = new Unity.Mathematics.Random((uint)(graph as PCGGraph).seed),
                     result = result
                 };
-                return noiseJob.Schedule(dependsOn);
+                return noiseJob.ScheduleParallel(pointsIn.Count, BATCH_COUNT, dependsOn);
             }
         }
     }

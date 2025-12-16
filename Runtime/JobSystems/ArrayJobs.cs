@@ -63,21 +63,18 @@ namespace PCG
         }
     }
 
-    struct SeparateAllVector3Job : IJob
+    struct SeparateAllVector3Job : IJobFor
     {
         public NativeArray<Vector3> array;
         public NativeArray<float> x;
         public NativeArray<float> y;
         public NativeArray<float> z;
 
-        public void Execute()
+        public void Execute(int i)
         {
-            for (int i = 0; i < array.Length; i++)
-            {
-                x[i] = array[i].x;
-                y[i] = array[i].y;
-                z[i] = array[i].z;
-            }
+            x[i] = array[i].x;
+            y[i] = array[i].y;
+            z[i] = array[i].z;
         }
     }
 

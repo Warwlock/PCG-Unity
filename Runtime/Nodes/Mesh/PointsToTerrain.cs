@@ -30,6 +30,8 @@ namespace PCG
         {
             inputPorts.PullDatas();
 
+            if (HandlePointErrors(pointsIn)) return emptyHandle;
+
             pointPos = new NativeArray<Vector3>(pointsIn.GetAttributeList<Vector3>(DefaultAttributes.Pos), Allocator.TempJob);
 
             handle = JobCreator();
