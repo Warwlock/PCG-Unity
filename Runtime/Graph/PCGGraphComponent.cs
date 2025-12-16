@@ -24,13 +24,9 @@ namespace PCG
             if (processGraph)
             {
                 processGraph = false;
-                int count = transform.childCount;
-                for (int i = 0; i < count; i++)
+                for (int i = transform.childCount - 1; i >= 0; i--)
                 {
-                    if(Application.isPlaying)
-                        Destroy(transform.GetChild(0).gameObject);
-                    else
-                        DestroyImmediate(transform.GetChild(0).gameObject);
+                    SmartDestroy(transform.GetChild(i).gameObject);
                 }
                 pcgGraph.seed = seed;
                 pcgGraph.ClearDebugPoints();
@@ -124,6 +120,25 @@ namespace PCG
             }
 
             pcgGraph.CreateDebugPoints();
+        }
+
+        public static void SmartDestroy(UnityEngine.Object obj)
+        {
+            if (obj == null)
+            {
+                return;
+            }
+
+#if UNITY_EDITOR
+            if (!Application.isPlaying)
+            {
+                GameObject.DestroyImmediate(obj);
+            }
+            else
+#endif
+            {
+                GameObject.Destroy(obj);
+            }
         }
     }
 }

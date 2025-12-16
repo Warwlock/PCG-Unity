@@ -52,7 +52,6 @@ namespace PCG
             for (int i = 0; i < meshes.Length; i++)
             {
                 meshes[i].RecalculateBounds();
-                meshes[i].RecalculateNormals();
             }
             (graph as PCGGraph).terrainMeshes.AddRange(meshes);
         }
@@ -68,12 +67,14 @@ namespace PCG
             {
                 int startIndex = i * pointsPerChunk * pointsPerChunk;
                 NativeSlice<Vector3> slice = new NativeSlice<Vector3>(pointPos, startIndex, pointsPerChunk * pointsPerChunk);
+                NativeArray<Vector3> normals = new NativeArray<Vector3>(slice.Length, Allocator.TempJob);
 
                 PointsToTerrainJob chunkMeshJob = new PointsToTerrainJob()
                 {
                     numX = pointsPerChunk,
                     numY = pointsPerChunk,
                     slice = slice,
+                    normals = normals,
                     meshData = meshDataArray[i],
                     useLOD = useLOD,
                     slope = slope,

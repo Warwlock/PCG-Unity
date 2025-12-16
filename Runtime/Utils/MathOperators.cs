@@ -36,7 +36,7 @@ namespace PCG
 
         public enum ChunkSizeEnum
         {
-            _240 = 241, _120 = 121, _72 = 73, _48 = 49, _24 = 25, _12 = 13
+            _240 = 243, _120 = 123, _72 = 75, _48 = 51, _24 = 27, _12 = 15
         }
 
         public enum LODEnum

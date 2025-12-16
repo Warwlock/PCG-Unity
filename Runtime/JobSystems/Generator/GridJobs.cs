@@ -54,8 +54,8 @@ namespace PCG
         {
             int chunkIndex = (cY * chunkX) + cX;
 
-            float chunkOffsetX = cX * (numX - 1) * pointDst;
-            float chunkOffsetZ = cY * (numY - 1) * pointDst;
+            float chunkOffsetX = cX * (numX - 3) * pointDst;
+            float chunkOffsetZ = cY * (numY - 3) * pointDst;
 
             for (int y = 0; y < numY; y++)
             {
