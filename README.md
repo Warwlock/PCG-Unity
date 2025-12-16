@@ -4,6 +4,6 @@ An open-source similar version of Unreal Engine's Procedural Content Generation 
 This tool is under a heavy development stage. You can try it but expect errors. Requires NodeGraphProcessor.
 
 # Credits
-- https://github.com/krubbles/NoiseDotNet
-- https://github.com/keijiro/StickShow
+- NoiseLibrary: https://github.com/krubbles/NoiseDotNet
+- Instancing: https://github.com/keijiro/StickShow
 - ...

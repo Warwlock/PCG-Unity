@@ -15,7 +15,9 @@ namespace PCG
         [SerializeField]
         public ChunkSizeEnum chunkSize = ChunkSizeEnum._48;
         public int chunkX = 5, chunkY = 5;
-        public float slope, bias;
+        [Header("LOD")]
+        public bool useLOD;
+        public float slope = 2, bias = 18;
 
         [Input]
         public PCGPointData pointsIn;
@@ -73,6 +75,7 @@ namespace PCG
                     numY = pointsPerChunk,
                     slice = slice,
                     meshData = meshDataArray[i],
+                    useLOD = useLOD,
                     slope = slope,
                     bias = bias
                 };

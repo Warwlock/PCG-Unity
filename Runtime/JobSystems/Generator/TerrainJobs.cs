@@ -10,9 +10,11 @@ namespace PCG
     struct PointsToTerrainJob : IJob
     {
         public int numX, numY;
-        public float slope, bias;
         [ReadOnly] public NativeSlice<Vector3> slice;
         public MeshData meshData;
+
+        public bool useLOD;
+        public float slope, bias;
 
         public void Execute()
         {
@@ -22,8 +24,12 @@ namespace PCG
 
             int meshSimplificationIncrement = 0;
             int lodAmount = GetLodAmount();
-            meshData.lodCount = lodAmount;
-            meshData.lodSelectionCurve = new Mesh.LodSelectionCurve(slope, bias);
+
+            if (useLOD)
+            {
+                meshData.lodCount = lodAmount;
+                meshData.lodSelectionCurve = new Mesh.LodSelectionCurve(slope, bias);
+            }
 
             int quadsX = numX - 1;
             int quadsY = numY - 1;
@@ -42,10 +48,10 @@ namespace PCG
                 indexCount += amount;
             }
 
+            int triangleAmount = (int)lodIndexCount[0] / 3;
+
             meshData.SetIndexBufferParams(indexCount, IndexFormat.UInt32);
             var indexData = meshData.GetIndexData<uint>();
-
-            meshData.subMeshCount = lodAmount;
 
             int iIndex = 0;
             for (int i = 0; i < lodAmount; i++)
@@ -75,16 +81,21 @@ namespace PCG
                 }
             }
 
+            meshData.subMeshCount = 1;
             meshData.SetSubMesh(0, new SubMeshDescriptor(0, indexCount));
 
-            for(int i = 0; i < lodAmount; i++)
+            if (useLOD)
             {
-                meshData.SetLod(0, i, new MeshLodRange(lodStartIndex[i], lodIndexCount[i]));
+                for (int i = 0; i < lodAmount; i++)
+                {
+                    meshData.SetLod(0, i, new MeshLodRange(lodStartIndex[i], lodIndexCount[i]));
+                }
             }
         }
 
         int GetLodAmount()
         {
+            if (!useLOD) return 1;
             switch (numX)
             {
                 case 241:
@@ -100,6 +111,17 @@ namespace PCG
                     return 5;
                 case 13:
                     return 4;
+            }
+        }
+
+        void CalculateNormals(int triangleAmount, NativeArray<uint> indexData)
+        {
+            for(int i = 0; i < triangleAmount; i++)
+            {
+                int normalTriIndex = i * 3;
+                uint indexVertexA = indexData[normalTriIndex];
+                uint indexVertexB = indexData[normalTriIndex + 1];
+                uint indexVertexC = indexData[normalTriIndex + 2];
             }
         }
     }
