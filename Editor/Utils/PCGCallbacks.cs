@@ -1,4 +1,4 @@
-using PCG;
+using PCG.Terrain;
 using System.IO;
 using System.Linq;
 using UnityEditor;
@@ -15,7 +15,15 @@ namespace PCG.Editor
         [MenuItem("Assets/Create/PCG/New PCG Graph", false, 83)]
         public static void CreateNewPCGGraph()
         {
-            var graphItem = ScriptableObject.CreateInstance<CreateGraphAction>();
+            var graphItem = ScriptableObject.CreateInstance<CreatePCGGraphAction>();
+            ProjectWindowUtil.StartNameEditingIfProjectWindowExists(0, graphItem,
+               $"NewGraph.{Extension}", null, null);
+        }
+
+        [MenuItem("Assets/Create/PCG/New PCG Terrain Graph", false, 83)]
+        public static void CreateNewPCGTerrainGraph()
+        {
+            var graphItem = ScriptableObject.CreateInstance<CreatePCGTerrainGraphAction>();
             ProjectWindowUtil.StartNameEditingIfProjectWindowExists(0, graphItem,
                $"NewGraph.{Extension}", null, null);
         }
@@ -38,14 +46,13 @@ namespace PCG.Editor
         public static PCGGraph GetGraphAtPath(string path)
             => AssetDatabase.LoadAllAssetsAtPath(path).FirstOrDefault(o => o is PCGGraph) as PCGGraph;
 
-        class CreateGraphAction : EndNameEditAction
+        class CreatePCGGraphAction : EndNameEditAction
         {
             public override void Action(int instanceId, string pathName, string resourceFile)
             {
                 PCGGraph graph = CreateNewGraph();
 
                 graph.name = Path.GetFileNameWithoutExtension(pathName);
-                //graph.hideFlags = HideFlags.HideInHierarchy;
 
                 AssetDatabase.CreateAsset(graph, pathName);
 
@@ -58,6 +65,30 @@ namespace PCG.Editor
             PCGGraph CreateNewGraph()
             {
                 PCGGraph g = CreateInstance(typeof(PCGGraph)) as PCGGraph;
+
+                return g;
+            }
+        }
+
+        class CreatePCGTerrainGraphAction : EndNameEditAction
+        {
+            public override void Action(int instanceId, string pathName, string resourceFile)
+            {
+                PCGTerrainGraph graph = CreateNewGraph();
+
+                graph.name = Path.GetFileNameWithoutExtension(pathName);
+
+                AssetDatabase.CreateAsset(graph, pathName);
+
+                ProjectWindowUtil.ShowCreatedAsset(graph);
+                Selection.activeObject = graph;
+                EditorApplication.delayCall += () => EditorGUIUtility.PingObject(graph);
+
+            }
+
+            PCGTerrainGraph CreateNewGraph()
+            {
+                PCGTerrainGraph g = CreateInstance(typeof(PCGTerrainGraph)) as PCGTerrainGraph;
 
                 return g;
             }

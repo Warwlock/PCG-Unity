@@ -1,29 +1,40 @@
-using Unity.Collections;
+using System;
 using System.Collections.Generic;
+using Unity.Burst;
+using Unity.Collections;
 using Unity.Jobs;
+using Unity.Mathematics;
 using UnityEngine;
 using UnityEngine.Rendering;
+using static UnityEngine.Mesh;
 using MeshData = UnityEngine.Mesh.MeshData;
 
 namespace PCG
 {
-    struct PointsToTerrainJob : IJob
+    [BurstCompile]
+    struct PointsToTerrainJob : IJobFor
     {
         public int numX, numY;
-        [ReadOnly] public NativeSlice<Vector3> slice;
-        public NativeArray<Vector3> normals;
-        public MeshData meshData;
+        [ReadOnly] public NativeArray<float3> points;
+        public MeshDataArray meshDataArray;
 
         public bool useLOD;
         public float slope, bias;
 
-        public void Execute()
+        public void Execute(int index)
         {
+            MeshData meshData = meshDataArray[index];
+            int pointsInChunk = numX * numY;
+            int globalStartIndex = index * pointsInChunk;
 
             meshData.SetVertexBufferParams(numX * numY, new VertexAttributeDescriptor(VertexAttribute.Position),
                 new VertexAttributeDescriptor(VertexAttribute.Normal, stream: 1));
-            var vertices = meshData.GetVertexData<Vector3>(0);
-            slice.CopyTo(vertices);
+            var vertices = meshData.GetVertexData<float3>(0);
+
+            for (int i = 0; i < pointsInChunk; i++)
+            {
+                vertices[i] = points[globalStartIndex + i];
+            }
 
             int meshSimplificationIncrement = 1;
             int lodAmount = GetLodAmount();
@@ -81,6 +92,8 @@ namespace PCG
             }
 
             // Normal calculation
+            NativeArray<float3> normals = new NativeArray<float3>(pointsInChunk, Allocator.Temp);
+
             int triangleAmount = normalIndexAmount / 3;
             for (int i = 0; i < triangleAmount; i++)
             {
@@ -89,13 +102,14 @@ namespace PCG
                 int indexVertexB = (int)indices[normalTriIndex + 1];
                 int indexVertexC = (int)indices[normalTriIndex + 2];
 
-                Vector3 pointA = vertices[indexVertexA];
-                Vector3 pointB = vertices[indexVertexB];
-                Vector3 pointC = vertices[indexVertexC];
+                float3 pointA = vertices[indexVertexA];
+                float3 pointB = vertices[indexVertexB];
+                float3 pointC = vertices[indexVertexC];
 
-                Vector3 sideAB = pointB - pointA;
-                Vector3 sideAC = pointC - pointA;
-                var triNormal = Vector3.Cross(sideAB, sideAC).normalized;
+                float3 sideAB = pointB - pointA;
+                float3 sideAC = pointC - pointA;
+
+                var triNormal = math.normalize(math.cross(sideAB, sideAC));
 
                 normals[indexVertexA] += triNormal;
                 normals[indexVertexB] += triNormal;
@@ -103,9 +117,10 @@ namespace PCG
             }
             for (int i = 0; i < normals.Length; i++)
             {
-                normals[i].Normalize();
+                math.normalize(normals[i]);
             }
-            normals.CopyTo(meshData.GetVertexData<Vector3>(1));
+
+            normals.CopyTo(meshData.GetVertexData<float3>(1));
 
             meshData.SetIndexBufferParams(indexCount, IndexFormat.UInt32);
             indices = meshData.GetIndexData<uint>();

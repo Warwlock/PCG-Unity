@@ -1,7 +1,12 @@
+using PCG.Terrain;
 using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
+using Unity.Collections;
 using Unity.Jobs;
+using Unity.Mathematics;
 using UnityEngine;
+using static UnityEngine.Mesh;
 
 namespace PCG
 {
@@ -31,9 +36,9 @@ namespace PCG
                 pcgGraph.seed = seed;
                 pcgGraph.ClearDebugPoints();
                 pcgGraph.CallOnStart();
-                StartCoroutine(ProcessGraphCoroutine(pcgGraph));
+                StartCoroutine(ProcessGraphCoroutine(pcgGraph as PCGTerrainGraph));
             }
-            if(pcgGraph.debugPointsCount > 0 && pcgGraph.debugMesh != null && pcgGraph.debugMaterial != null && pcgGraph._densityBuffer != null && pcgGraph.readyForDebugRender)
+            if (pcgGraph.debugPointsCount > 0 && pcgGraph.debugMesh != null && pcgGraph.debugMaterial != null && pcgGraph._densityBuffer != null && pcgGraph.readyForDebugRender)
             {
                 pcgGraph._densityBuffer.SetData(pcgGraph.debugPointDensities);
                 pcgGraph.debugMaterial.SetBuffer("_InstanceDensityBuffer", pcgGraph._densityBuffer);
@@ -60,15 +65,24 @@ namespace PCG
             obj.transform.parent = transform;
             var mf = obj.AddComponent<MeshFilter>();
             var mr = obj.AddComponent<MeshRenderer>();
+            //var col = obj.AddComponent<MeshCollider>();
 
             mr.material = mat;
             mf.mesh = mesh;
+            //col.sharedMesh = mesh;
         }
 
-        IEnumerator ProcessGraphCoroutine(PCGGraph graph)
+        IEnumerator ProcessGraphCoroutine(PCGTerrainGraph graph)
         {
             var sortedNodes = graph.nodes.Where(n => n.computeOrder >= 0).OrderBy(n => n.computeOrder).ToList();
 
+            if(graph is PCGTerrainGraph ptg)
+            {
+                int totalPoints = ((int)ptg.chunkSize * ptg.chunkX) * ((int)ptg.chunkSize * ptg.chunkY);
+                ptg.points = new NativeArray<float3>(totalPoints, Allocator.TempJob);
+            }
+
+            JobHandle dependsOn = default;
             int maxLoopCount = 0;
             for (int executionIndex = 0; executionIndex < sortedNodes.Count; executionIndex++)
             {
@@ -108,13 +122,44 @@ namespace PCG
                         yield return null;
                     }
                 }
+                else if (node is BaseChainJobNode bcjn)
+                {
+                    dependsOn = bcjn.Process(dependsOn);
+
+                }
                 else
                 {
                     node.OnProcess();
                 }
             }
 
-            foreach(var mesh in pcgGraph.terrainMeshes)
+            while (!dependsOn.IsCompleted)
+                yield return null;
+
+            if (dependsOn.IsCompleted)
+            {
+                dependsOn.Complete();
+
+                for (int executionIndex = 0; executionIndex < sortedNodes.Count; executionIndex++)
+                {
+                    maxLoopCount++;
+                    if (maxLoopCount > 10000)
+                    {
+                        Debug.LogError("Exceeded 10000 node limit or something went horribly wrong.");
+                        yield break;
+                    }
+
+                    var node = sortedNodes[executionIndex];
+
+                    if (node.computeOrder < 0 || !node.canProcess)
+                        continue;
+
+                    if (node is BaseChainJobNode bcjn)
+                        bcjn.OnJobCompleted();
+                }
+            }
+
+            foreach (var mesh in pcgGraph.terrainMeshes)
             {
                 CreateObject(mesh);
             }

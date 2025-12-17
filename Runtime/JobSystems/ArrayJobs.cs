@@ -1,5 +1,6 @@
 using Unity.Collections;
 using Unity.Jobs;
+using Unity.Mathematics;
 using UnityEngine;
 
 namespace PCG
@@ -66,6 +67,21 @@ namespace PCG
     struct SeparateAllVector3Job : IJobFor
     {
         public NativeArray<Vector3> array;
+        public NativeArray<float> x;
+        public NativeArray<float> y;
+        public NativeArray<float> z;
+
+        public void Execute(int i)
+        {
+            x[i] = array[i].x;
+            y[i] = array[i].y;
+            z[i] = array[i].z;
+        }
+    }
+
+    struct SeparateAllFloat3Job : IJobFor
+    {
+        public NativeArray<float3> array;
         public NativeArray<float> x;
         public NativeArray<float> y;
         public NativeArray<float> z;

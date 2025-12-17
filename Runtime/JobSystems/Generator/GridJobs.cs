@@ -1,5 +1,6 @@
 using Unity.Collections;
 using Unity.Jobs;
+using Unity.Mathematics;
 using UnityEngine;
 
 namespace PCG
@@ -33,7 +34,7 @@ namespace PCG
         public int numX, numY;
         public int chunkX, chunkY;
         public float pointDst;
-        public NativeArray<Vector3> result;
+        public NativeArray<float3> result;
 
         public void Execute()
         {
@@ -67,7 +68,7 @@ namespace PCG
                     float posX = x * pointDst + chunkOffsetX;
                     float posZ = y * pointDst + chunkOffsetZ;
 
-                    result[index] = new Vector3(posX, 0, posZ);
+                    result[index] = new float3(posX, 0, posZ);
                 }
             }
         }
