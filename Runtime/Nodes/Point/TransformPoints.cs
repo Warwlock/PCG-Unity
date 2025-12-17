@@ -37,7 +37,10 @@ namespace PCG
 
             if (HandlePointErrors(pointsIn)) return emptyHandle;
 
-            points = new PCGPointData(pointsIn);
+            if (outputPorts[0].GetEdges().Count > 1)
+                points = new PCGPointData(pointsIn);
+            else
+                points = pointsIn;
 
             points.CreateAttribute(DefaultAttributes.Pos, Vector3.zero);
             points.CreateAttribute(DefaultAttributes.Rot, Vector3.zero);
@@ -79,7 +82,7 @@ namespace PCG
                     density = density,
                     vector = resultPos
                 };
-                dependsOn = translateData.ScheduleParallelByRef(resultPos.Length, BATCH_COUNT, dependsOn);
+                dependsOn = translateData.ScheduleParallel(resultPos.Length, BATCH_COUNT, dependsOn);
             }
             else
             {
@@ -90,7 +93,7 @@ namespace PCG
                     density = density,
                     vector = resultPos
                 };
-                dependsOn = translateData.ScheduleParallelByRef(resultPos.Length, BATCH_COUNT, dependsOn);
+                dependsOn = translateData.ScheduleParallel(resultPos.Length, BATCH_COUNT, dependsOn);
             }
 
             if (AbsoluteRotation)
@@ -102,7 +105,7 @@ namespace PCG
                     density = density,
                     vector = resultRot
                 };
-                dependsOn = rotateData.ScheduleParallelByRef(resultPos.Length, BATCH_COUNT, dependsOn);
+                dependsOn = rotateData.ScheduleParallel(resultPos.Length, BATCH_COUNT, dependsOn);
             }
             else
             {
@@ -113,7 +116,7 @@ namespace PCG
                     density = density,
                     vector = resultRot
                 };
-                dependsOn = rotateData.ScheduleParallelByRef(resultPos.Length, BATCH_COUNT, dependsOn);
+                dependsOn = rotateData.ScheduleParallel(resultPos.Length, BATCH_COUNT, dependsOn);
             }
 
             if (AbsoluteScale)
@@ -125,7 +128,7 @@ namespace PCG
                     density = density,
                     vector = resultSca
                 };
-                dependsOn = scaleData.ScheduleParallelByRef(resultPos.Length, BATCH_COUNT, dependsOn);
+                dependsOn = scaleData.ScheduleParallel(resultPos.Length, BATCH_COUNT, dependsOn);
             }
             else
             {
@@ -136,7 +139,7 @@ namespace PCG
                     density = density,
                     vector = resultSca
                 };
-                dependsOn = scaleData.ScheduleParallelByRef(resultPos.Length, BATCH_COUNT, dependsOn);
+                dependsOn = scaleData.ScheduleParallel(resultPos.Length, BATCH_COUNT, dependsOn);
             }
 
             return dependsOn;

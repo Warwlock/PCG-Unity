@@ -21,7 +21,9 @@ namespace PCG
         [HideInInspector] public List<Matrix4x4> debugPointMatrices = new();
         [HideInInspector] public List<float> debugPointDensities = new();
         public int debugPointsCount;
-        [HideInInspector] public bool readyForDebugRender;
+
+        public bool readyForDebugRender { get; set; }
+        public bool isGraphProcessed { get; set; } = false;
 
         // Mesh Fields
         public List<Mesh> terrainMeshes;
@@ -42,6 +44,12 @@ namespace PCG
             readyForDebugRender = true;
         }
 
+        public void AfterNodesProcessed()
+        {
+            isGraphProcessed = true;
+            CreateDebugPoints();
+        }
+
         public void ClearDelegates()
         {
             OnStart = null;
@@ -51,6 +59,8 @@ namespace PCG
         public void CallOnStart()
         {
             terrainMeshes.Clear();
+            isGraphProcessed = false;
+
             OnStart?.Invoke();
         }
 

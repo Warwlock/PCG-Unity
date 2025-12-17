@@ -5,6 +5,8 @@ namespace PCG
 {
     public abstract class BasePCGNode : BaseNode
     {
+        public new PCGGraph graph => base.graph as PCGGraph;
+
         [HideInInspector]
         public bool debugAttribute;
 

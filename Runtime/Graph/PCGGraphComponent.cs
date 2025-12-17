@@ -119,7 +119,7 @@ namespace PCG
                 CreateObject(mesh);
             }
 
-            pcgGraph.CreateDebugPoints();
+            pcgGraph.AfterNodesProcessed();
         }
 
         public static void SmartDestroy(UnityEngine.Object obj)

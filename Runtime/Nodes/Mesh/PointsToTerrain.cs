@@ -55,7 +55,7 @@ namespace PCG
             {
                 meshes[i].RecalculateBounds();
             }
-            (graph as PCGGraph).terrainMeshes.AddRange(meshes);
+            graph.terrainMeshes.AddRange(meshes);
         }
 
         JobHandle JobCreator()
@@ -82,7 +82,10 @@ namespace PCG
                     slope = slope,
                     bias = bias
                 };
-                dependencies.Add(chunkMeshJob.Schedule());
+                var jobHandle = chunkMeshJob.Schedule();
+                dependencies.Add(jobHandle);
+
+                normals.Dispose(jobHandle);
             }
 
             var dependArray = new NativeArray<JobHandle>(dependencies.ToArray(), Allocator.TempJob);

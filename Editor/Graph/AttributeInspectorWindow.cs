@@ -50,7 +50,7 @@ namespace PCG.Editor
         {
             if (graph == null) return;
 
-            if (!graph.readyForDebugRender) return;
+            if (!graph.isGraphProcessed) return;
 
             node = graph.GetDebugAttributeNode();
 

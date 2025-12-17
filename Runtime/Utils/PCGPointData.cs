@@ -45,7 +45,6 @@ namespace PCG
         private Dictionary<string, IAttributeBuffer> _attributes = new();
 
         public Dictionary<string, IAttributeBuffer> Attributes { get { return _attributes; } }
-        //private Dictionary<string, Type> _attributeTypes = new();
 
         public int Count { get; private set; }
         public string lastModifiedAttribute;

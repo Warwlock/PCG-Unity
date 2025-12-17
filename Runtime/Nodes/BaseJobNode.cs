@@ -13,9 +13,9 @@ namespace PCG
         public abstract JobHandle OnStartJobProcess();
         public static JobHandle emptyHandle = new JobHandle();
 
-        internal static int BATCH_COUNT = 64;
+        internal static int BATCH_COUNT = 32;
 
-        bool parallelJobs = false;
+        //bool parallelJobs = false;
 
         public void OnEndJobProcess()
         {
