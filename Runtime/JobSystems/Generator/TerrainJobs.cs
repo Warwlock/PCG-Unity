@@ -11,11 +11,12 @@ using MeshData = UnityEngine.Mesh.MeshData;
 
 namespace PCG
 {
-    [BurstCompile]
+    //[BurstCompile]
     struct PointsToTerrainJob : IJobFor
     {
         public int numX, numY;
         [ReadOnly] public NativeArray<float3> points;
+        [ReadOnly] public NativeArray<VertexAttributeDescriptor> descriptor;
         public MeshDataArray meshDataArray;
 
         public bool useLOD;
@@ -27,8 +28,7 @@ namespace PCG
             int pointsInChunk = numX * numY;
             int globalStartIndex = index * pointsInChunk;
 
-            meshData.SetVertexBufferParams(numX * numY, new VertexAttributeDescriptor(VertexAttribute.Position),
-                new VertexAttributeDescriptor(VertexAttribute.Normal, stream: 1));
+            meshData.SetVertexBufferParams(numX * numY, descriptor);
             var vertices = meshData.GetVertexData<float3>(0);
 
             for (int i = 0; i < pointsInChunk; i++)
@@ -47,20 +47,6 @@ namespace PCG
 
             int quadsX = numX - 1;
             int quadsY = numY - 1;
-            uint[] lodStartIndex = new uint[lodAmount];
-            uint[] lodIndexCount = new uint[lodAmount];
-
-            int indexCount = 0;
-            for (int i = 0; i < lodAmount; i++)
-            {
-                int amountIncrement = i == 0 ? 1 : i * 2;
-                int amount = ((quadsX - 2) * (quadsX - 2)) * 6 / (amountIncrement * amountIncrement);
-                lodIndexCount[i] = (uint)amount;
-
-                lodStartIndex[i] = (uint)indexCount;
-
-                indexCount += amount;
-            }
 
             int normalIndexAmount = (quadsX * quadsY) * 6;
             meshData.SetIndexBufferParams(normalIndexAmount, IndexFormat.UInt32);
@@ -121,6 +107,22 @@ namespace PCG
             }
 
             normals.CopyTo(meshData.GetVertexData<float3>(1));
+            normals.Dispose();
+
+            var lodStartIndex = new NativeArray<uint>(lodAmount, Allocator.Temp);
+            var lodIndexCount = new NativeArray<uint>(lodAmount, Allocator.Temp);
+
+            int indexCount = 0;
+            for (int i = 0; i < lodAmount; i++)
+            {
+                int amountIncrement = i == 0 ? 1 : i * 2;
+                int amount = ((quadsX - 2) * (quadsX - 2)) * 6 / (amountIncrement * amountIncrement);
+                lodIndexCount[i] = (uint)amount;
+
+                lodStartIndex[i] = (uint)indexCount;
+
+                indexCount += amount;
+            }
 
             meshData.SetIndexBufferParams(indexCount, IndexFormat.UInt32);
             indices = meshData.GetIndexData<uint>();
@@ -164,6 +166,9 @@ namespace PCG
                     meshData.SetLod(0, i, new MeshLodRange(lodStartIndex[i], lodIndexCount[i]));
                 }
             }
+
+            lodStartIndex.Dispose();
+            lodIndexCount.Dispose();
         }
 
         int GetLodAmount()
@@ -185,6 +190,17 @@ namespace PCG
                 case 15:
                     return 4;
             }
+        }
+    }
+
+    [BurstCompile]
+    public struct BakeTerrainColliderMeshJob : IJobFor
+    {
+        public NativeArray<EntityId> meshIds;
+
+        public void Execute(int index)
+        {
+            Physics.BakeMesh(meshIds[index], false);
         }
     }
 }

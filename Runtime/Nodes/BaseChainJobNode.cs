@@ -8,7 +8,7 @@ namespace PCG
     {
         public new PCGTerrainGraph graph => base.graph as PCGTerrainGraph;
 
-        internal static int BATCH_COUNT = 32;
+        internal static int BATCH_COUNT = 64;
 
         public abstract JobHandle Process(JobHandle dependsOn);
 

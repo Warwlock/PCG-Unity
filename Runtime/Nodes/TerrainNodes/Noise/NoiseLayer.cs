@@ -34,6 +34,7 @@ namespace PCG.Terrain
 
         public override JobHandle Process(JobHandle dependsOn)
         {
+            Debug.Log("StartB");
             if (noiseFunctions == MathOperators.NoiseFunctions.PerlinNoise)
             {
                 if (octaves == 1)
@@ -47,7 +48,7 @@ namespace PCG.Terrain
                         amplitude = amplitude,
                         verts = graph.points
                     };
-                    dependsOn = noiseJob.ScheduleParallel(graph.points.Length, BATCH_COUNT, dependsOn);
+                    dependsOn = noiseJob.Schedule(graph.points.Length, dependsOn);
                 }
                 else
                 {
@@ -111,6 +112,11 @@ namespace PCG.Terrain
             }
 
             return dependsOn;
+        }
+
+        public override void OnJobCompleted()
+        {
+            Debug.Log("NoiseLayer!");
         }
     }
 }

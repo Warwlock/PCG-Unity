@@ -18,6 +18,7 @@ namespace PCG.Terrain
 
         public override JobHandle Process(JobHandle dependsOn)
         {
+            Debug.Log("StartA");
             ChunkGridTerrainJob jobData = new ChunkGridTerrainJob
             {
                 numX = (int)graph.chunkSize,
@@ -30,6 +31,11 @@ namespace PCG.Terrain
             dependsOn = jobData.Schedule(dependsOn);
 
             return dependsOn;
+        }
+
+        public override void OnJobCompleted()
+        {
+            Debug.Log("GridTerrrain!");
         }
     }
 }

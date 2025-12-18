@@ -10,7 +10,7 @@ using static UnityEngine.Mesh;
 
 namespace PCG
 {
-    [ExecuteAlways]
+    //[ExecuteAlways]
     public class PCGGraphComponent : MonoBehaviour
     {
         public PCGGraph pcgGraph;
@@ -18,9 +18,21 @@ namespace PCG
         public int seed = 42;
         public Material mat;
 
+        Mesh[] meshes = new Mesh[0];
+
         void Start()
         {
-
+            meshes = new Mesh[(pcgGraph as PCGTerrainGraph).chunkX * (pcgGraph as PCGTerrainGraph).chunkY];
+            for (int i = 0; i < meshes.Length; i++)
+            {
+                meshes[i] = new Mesh();
+                meshes[i].hideFlags = HideFlags.DontSaveInBuild | HideFlags.DontSaveInEditor;
+                meshes[i].name = "Chunk" + i;
+            }
+            foreach (var mesh in meshes)
+            {
+                CreateTerrainObjects(mesh, false);
+            }
         }
 
         // Update is called once per frame
@@ -29,14 +41,19 @@ namespace PCG
             if (processGraph)
             {
                 processGraph = false;
-                for (int i = transform.childCount - 1; i >= 0; i--)
+                /*for (int i = transform.childCount - 1; i >= 0; i--)
                 {
                     SmartDestroy(transform.GetChild(i).gameObject);
-                }
+                }*/
                 pcgGraph.seed = seed;
                 pcgGraph.ClearDebugPoints();
                 pcgGraph.CallOnStart();
-                StartCoroutine(ProcessGraphCoroutine(pcgGraph as PCGTerrainGraph));
+                if (pcgGraph is PCGTerrainGraph terrainGraph)
+                {
+                    ProcessTerrainGraph(pcgGraph as PCGTerrainGraph);
+                }
+                else
+                    StartCoroutine(ProcessGraphCoroutine(pcgGraph));
             }
             if (pcgGraph.debugPointsCount > 0 && pcgGraph.debugMesh != null && pcgGraph.debugMaterial != null && pcgGraph._densityBuffer != null && pcgGraph.readyForDebugRender)
             {
@@ -59,30 +76,34 @@ namespace PCG
             }
         }
 
-        void CreateObject(Mesh mesh)
+        public void GenerateButton()
+        {
+            UnityEngine.Random.InitState(System.DateTime.Now.ToString("o").GetHashCode());
+            seed = UnityEngine.Random.Range(1, 999999999);
+            processGraph = true;
+        }
+
+        void CreateTerrainObjects(Mesh mesh, bool generateCollision)
         {
             var obj = new GameObject();
             obj.transform.parent = transform;
             var mf = obj.AddComponent<MeshFilter>();
             var mr = obj.AddComponent<MeshRenderer>();
-            //var col = obj.AddComponent<MeshCollider>();
 
             mr.material = mat;
             mf.mesh = mesh;
-            //col.sharedMesh = mesh;
+
+            if (generateCollision)
+            {
+                var col = obj.AddComponent<MeshCollider>();
+                col.sharedMesh = mesh;
+            }
         }
 
-        IEnumerator ProcessGraphCoroutine(PCGTerrainGraph graph)
+        IEnumerator ProcessGraphCoroutine(PCGGraph graph)
         {
             var sortedNodes = graph.nodes.Where(n => n.computeOrder >= 0).OrderBy(n => n.computeOrder).ToList();
 
-            if(graph is PCGTerrainGraph ptg)
-            {
-                int totalPoints = ((int)ptg.chunkSize * ptg.chunkX) * ((int)ptg.chunkSize * ptg.chunkY);
-                ptg.points = new NativeArray<float3>(totalPoints, Allocator.TempJob);
-            }
-
-            JobHandle dependsOn = default;
             int maxLoopCount = 0;
             for (int executionIndex = 0; executionIndex < sortedNodes.Count; executionIndex++)
             {
@@ -125,7 +146,6 @@ namespace PCG
                 else if (node is BaseChainJobNode bcjn)
                 {
                     dependsOn = bcjn.Process(dependsOn);
-
                 }
                 else
                 {
@@ -133,38 +153,88 @@ namespace PCG
                 }
             }
 
-            while (!dependsOn.IsCompleted)
-                yield return null;
+            pcgGraph.AfterNodesProcessed();
+        }
 
-            if (dependsOn.IsCompleted)
+        JobHandle dependsOn = default;
+        void ProcessTerrainGraph(PCGTerrainGraph graph)
+        {
+            var sortedNodes = graph.nodes.Where(n => n.computeOrder >= 0).OrderBy(n => n.computeOrder).ToList();
+
+            int totalPoints = ((int)graph.chunkSize * graph.chunkX) * ((int)graph.chunkSize * graph.chunkY);
+            graph.points = new NativeArray<float3>(totalPoints, Allocator.Persistent);
+
+            int maxLoopCount = 0;
+            bool haveColliderNode = false;
+            for (int executionIndex = 0; executionIndex < sortedNodes.Count; executionIndex++)
             {
-                dependsOn.Complete();
-
-                for (int executionIndex = 0; executionIndex < sortedNodes.Count; executionIndex++)
+                maxLoopCount++;
+                if (maxLoopCount > 10000)
                 {
-                    maxLoopCount++;
-                    if (maxLoopCount > 10000)
-                    {
-                        Debug.LogError("Exceeded 10000 node limit or something went horribly wrong.");
-                        yield break;
-                    }
+                    Debug.LogError("Exceeded 10000 node limit or something went horribly wrong.");
+                    return;
+                }
 
-                    var node = sortedNodes[executionIndex];
+                var node = sortedNodes[executionIndex];
 
-                    if (node.computeOrder < 0 || !node.canProcess)
-                        continue;
+                if (node.computeOrder < 0 || !node.canProcess)
+                    return;
 
-                    if (node is BaseChainJobNode bcjn)
-                        bcjn.OnJobCompleted();
+                if (node is BaseChainJobNode bcjn)
+                {
+                    if(executionIndex == 0)
+                        dependsOn = bcjn.OnProcess(dependsOn);
+
+                    BaseChainJobNode nextNode = null;
+                    if (executionIndex + 1 != sortedNodes.Count)
+                        nextNode = sortedNodes[executionIndex + 1] as BaseChainJobNode;
+
+                    StartCoroutine(WaitJobCompletion(bcjn, nextNode, dependsOn));
+
+                    if (node is Terrain.TerrainCollider)
+                        haveColliderNode = true;
+                }
+                else
+                {
+                    Debug.LogError("Node is not supported.");
                 }
             }
 
-            foreach (var mesh in pcgGraph.terrainMeshes)
-            {
-                CreateObject(mesh);
-            }
+            StartCoroutine(LastProcess(dependsOn, haveColliderNode));
+        }
 
-            pcgGraph.AfterNodesProcessed();
+        IEnumerator WaitJobCompletion(BaseChainJobNode node, BaseChainJobNode nextNode, JobHandle dependecy)
+        {
+            while (!dependsOn.IsCompleted)
+                yield return null;            
+
+            dependsOn.Complete();
+            node.OnJobCompleted();
+            if (nextNode != null)
+            {
+                if (nextNode is PointsToTerrain pttnext)
+                {
+                    var meshDataArray = Mesh.AllocateWritableMeshData(meshes.Length);
+                    pttnext.SetMeshes(meshes, ref meshDataArray);
+                }
+                dependsOn = nextNode.OnProcess(dependsOn);
+            }
+        }
+
+        IEnumerator LastProcess(JobHandle dependsOne, bool generateCollision)
+        {
+            while (!dependsOn.IsCompleted)
+                yield return null;
+
+            dependsOn.Complete();
+            (pcgGraph as PCGTerrainGraph).points.Dispose(dependsOn);
+            /*for (int i = 0; i < pcgGraph.terrainMeshes.Count; i++)
+            {
+                var mesh = pcgGraph.terrainMeshes[i];
+                CreateMeshes(mesh, generateCollision);
+                if(i % 10 == 0)
+                    yield return null;
+            }*/
         }
 
         public static void SmartDestroy(UnityEngine.Object obj)

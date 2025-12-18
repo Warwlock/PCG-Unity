@@ -46,7 +46,7 @@ namespace PCG
         }
     }
 
-    [BurstCompile(CompileSynchronously = true, FloatMode = FloatMode.Fast, FloatPrecision = FloatPrecision.Low)]
+    [BurstCompile(FloatMode = FloatMode.Fast, FloatPrecision = FloatPrecision.Low)]
     public struct GradientNoise3DTerrainJob : IJobFor
     {
         public int seed;
@@ -59,6 +59,7 @@ namespace PCG
         public void Execute(int i)
         {
             float3 val = verts[i];
+            float3 freq = new float3(xFrequency,  yFrequency, zFrequency);
             val.y += (Noise.GradientNoise3DVector(verts[i].x * xFrequency, verts[i].y * yFrequency, verts[i].z * zFrequency, seed) * amplitude + 1) * 0.5f;
             verts[i] = val;
         }

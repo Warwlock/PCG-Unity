@@ -25,8 +25,6 @@ namespace PCG
         public bool readyForDebugRender { get; set; }
         public bool isGraphProcessed { get; set; } = false;
 
-        // Mesh Fields
-        public List<Mesh> terrainMeshes;
 
         public void ClearDebugPoints()
         {
@@ -58,7 +56,6 @@ namespace PCG
 
         public void CallOnStart()
         {
-            terrainMeshes.Clear();
             isGraphProcessed = false;
 
             OnStart?.Invoke();

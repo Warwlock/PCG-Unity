@@ -20,12 +20,21 @@ namespace PCG.Terrain
         [Input]
         public int input;
 
+        Mesh[] meshes;
         MeshDataArray meshDataArray;
 
         public override JobHandle Process(JobHandle dependsOn)
         {
+            Debug.Log("StartC");
             int totalChunks = graph.chunkX * graph.chunkY;
-            meshDataArray = Mesh.AllocateWritableMeshData(totalChunks);
+
+            var descriptor = new[]
+            {
+                new VertexAttributeDescriptor(VertexAttribute.Position),
+                new VertexAttributeDescriptor(VertexAttribute.Normal, stream: 1)
+            };
+
+            var descriptorArray = new NativeArray<VertexAttributeDescriptor>(descriptor, Allocator.Persistent);
 
             int pointsPerChunk = (int)graph.chunkSize * (int)graph.chunkSize;
             PointsToTerrainJob chunkMeshJob = new PointsToTerrainJob()
@@ -33,31 +42,34 @@ namespace PCG.Terrain
                 numX = (int)graph.chunkSize,
                 numY = (int)graph.chunkSize,
                 points = graph.points,
+                descriptor = descriptorArray,
                 meshDataArray = meshDataArray,
                 useLOD = useLOD,
                 slope = slope,
                 bias = bias
             };
-            dependsOn = chunkMeshJob.ScheduleParallel(totalChunks, BATCH_COUNT, dependsOn);
+            dependsOn = chunkMeshJob.Schedule(totalChunks, dependsOn);
+
+            descriptorArray.Dispose(dependsOn);
 
             return dependsOn;
         }
 
+        public void SetMeshes(Mesh[] meshes, ref MeshDataArray meshDataArray)
+        {
+            this.meshes = meshes;
+            this.meshDataArray = meshDataArray;
+        }
+
         public override void OnJobCompleted()
         {
-            int totalChunks = graph.chunkX * graph.chunkY;
-            Mesh[] meshes = new Mesh[totalChunks];
-            for (int i = 0; i < meshes.Length; i++)
-            {
-                meshes[i] = new Mesh();
-                meshes[i].name = "Chunk" + i;
-            }
+            Debug.Log("YESSS!");
+
             Mesh.ApplyAndDisposeWritableMeshData(meshDataArray, meshes);
-            for (int i = 0; i < meshes.Length; i++)
+            for(int i = 0; i < meshes.Length; i++)
             {
                 meshes[i].RecalculateBounds();
             }
-            graph.terrainMeshes.AddRange(meshes);
         }
     }
 }
