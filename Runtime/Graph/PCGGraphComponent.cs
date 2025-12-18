@@ -19,6 +19,7 @@ namespace PCG
         public Material mat;
 
         Mesh[] meshes = new Mesh[0];
+        List<GameObject> terrainObjs = new List<GameObject>();
 
         void Start()
         {
@@ -31,7 +32,7 @@ namespace PCG
             }
             foreach (var mesh in meshes)
             {
-                CreateTerrainObjects(mesh, false);
+                terrainObjs.Add(CreateTerrainObjects(mesh, (pcgGraph as PCGTerrainGraph).generateCollisions));
             }
         }
 
@@ -83,7 +84,7 @@ namespace PCG
             processGraph = true;
         }
 
-        void CreateTerrainObjects(Mesh mesh, bool generateCollision)
+        GameObject CreateTerrainObjects(Mesh mesh, bool generateCollision)
         {
             var obj = new GameObject();
             obj.transform.parent = transform;
@@ -96,7 +97,25 @@ namespace PCG
             if (generateCollision)
             {
                 var col = obj.AddComponent<MeshCollider>();
-                col.sharedMesh = mesh;
+            }
+
+            return obj;
+        }
+
+        void ApplyCollisions()
+        {
+            for (int i = 0; i < terrainObjs.Count; i++)
+            {
+                var obj = terrainObjs[i];
+                if (obj.TryGetComponent<MeshCollider>(out var collider))
+                {
+                    collider.sharedMesh = meshes[i];
+                }
+                else
+                {
+                    var col = obj.AddComponent<MeshCollider>();
+                    col.sharedMesh = meshes[i];
+                }
             }
         }
 
@@ -228,13 +247,29 @@ namespace PCG
 
             dependsOn.Complete();
             (pcgGraph as PCGTerrainGraph).points.Dispose(dependsOn);
-            /*for (int i = 0; i < pcgGraph.terrainMeshes.Count; i++)
+            if((pcgGraph as PCGTerrainGraph).generateCollisions)
             {
-                var mesh = pcgGraph.terrainMeshes[i];
-                CreateMeshes(mesh, generateCollision);
-                if(i % 10 == 0)
+                NativeArray<EntityId> meshIds = new NativeArray<EntityId>(meshes.Length, Allocator.TempJob);
+
+                for (int i = 0; i < meshes.Length; ++i)
+                {
+                    meshIds[i] = meshes[i].GetEntityId();
+                }
+
+                BakeTerrainColliderMeshJob job = new BakeTerrainColliderMeshJob
+                {
+                    meshIds = meshIds
+                };
+                JobHandle handle = default;
+                handle = job.ScheduleParallel(meshIds.Length, meshIds.Length / (SystemInfo.processorCount / 2), handle);
+                meshIds.Dispose(handle);
+
+                while (!handle.IsCompleted)
                     yield return null;
-            }*/
+
+                handle.Complete();
+                ApplyCollisions();
+            }
         }
 
         public static void SmartDestroy(UnityEngine.Object obj)

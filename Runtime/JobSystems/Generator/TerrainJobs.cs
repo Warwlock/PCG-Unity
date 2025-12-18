@@ -17,6 +17,7 @@ namespace PCG
         public int numX, numY;
         [ReadOnly] public NativeArray<float3> points;
         [ReadOnly] public NativeArray<VertexAttributeDescriptor> descriptor;
+        [WriteOnly] public NativeArray<Bounds> bounds;
         public MeshDataArray meshDataArray;
 
         public bool useLOD;
@@ -28,13 +29,20 @@ namespace PCG
             int pointsInChunk = numX * numY;
             int globalStartIndex = index * pointsInChunk;
 
+            float3 min = new float3(float.MaxValue);
+            float3 max = new float3(float.MinValue);
+
             meshData.SetVertexBufferParams(numX * numY, descriptor);
             var vertices = meshData.GetVertexData<float3>(0);
 
             for (int i = 0; i < pointsInChunk; i++)
             {
                 vertices[i] = points[globalStartIndex + i];
+                min = math.min(min, vertices[i]);
+                max = math.max(max, vertices[i]);
             }
+
+            bounds[index] = new Bounds((min + max) * 0.5f, max - min);
 
             int meshSimplificationIncrement = 1;
             int lodAmount = GetLodAmount();

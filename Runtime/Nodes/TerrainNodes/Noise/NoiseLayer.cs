@@ -48,7 +48,7 @@ namespace PCG.Terrain
                         amplitude = amplitude,
                         verts = graph.points
                     };
-                    dependsOn = noiseJob.Schedule(graph.points.Length, dependsOn);
+                    dependsOn = noiseJob.ScheduleParallel(graph.points.Length, graph.points.Length / batchDivisor, dependsOn);
                 }
                 else
                 {
@@ -64,7 +64,7 @@ namespace PCG.Terrain
                         octaves = octaves,
                         verts = graph.points
                     };
-                    dependsOn = noiseJob.ScheduleParallel(graph.points.Length, BATCH_COUNT, dependsOn);
+                    dependsOn = noiseJob.ScheduleParallel(graph.points.Length, graph.points.Length / batchDivisor, dependsOn);
                 }
             }
             else if (noiseFunctions == MathOperators.NoiseFunctions.CellularNoise)
@@ -81,7 +81,7 @@ namespace PCG.Terrain
                         amplitude2 = amplitude,
                         verts = graph.points
                     };
-                    dependsOn = noiseJob.ScheduleParallel(graph.points.Length, BATCH_COUNT, dependsOn);
+                    dependsOn = noiseJob.ScheduleParallel(graph.points.Length, graph.points.Length / batchDivisor, dependsOn);
                 }
                 else
                 {
@@ -98,7 +98,7 @@ namespace PCG.Terrain
                         octaves = octaves,
                         verts = graph.points
                     };
-                    dependsOn = noiseJob.ScheduleParallel(graph.points.Length, BATCH_COUNT, dependsOn);
+                    dependsOn = noiseJob.ScheduleParallel(graph.points.Length, graph.points.Length / batchDivisor, dependsOn);
                 }
             }
             else
@@ -108,7 +108,7 @@ namespace PCG.Terrain
                     random = new Unity.Mathematics.Random((uint)graph.seed),
                     verts = graph.points
                 };
-                dependsOn = noiseJob.ScheduleParallel(graph.points.Length, BATCH_COUNT, dependsOn);
+                dependsOn = noiseJob.ScheduleParallel(graph.points.Length, graph.points.Length / batchDivisor, dependsOn);
             }
 
             return dependsOn;

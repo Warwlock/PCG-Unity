@@ -1,6 +1,7 @@
 using GraphProcessor;
 using PCG.Terrain;
 using Unity.Jobs;
+using UnityEngine;
 
 namespace PCG
 {
@@ -9,6 +10,7 @@ namespace PCG
         public new PCGTerrainGraph graph => base.graph as PCGTerrainGraph;
 
         internal static int BATCH_COUNT = 64;
+        internal static int batchDivisor => SystemInfo.processorCount / 2;
 
         public abstract JobHandle Process(JobHandle dependsOn);
 

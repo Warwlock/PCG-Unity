@@ -22,6 +22,7 @@ namespace PCG.Terrain
 
         Mesh[] meshes;
         MeshDataArray meshDataArray;
+        NativeArray<Bounds> boundsArray;
 
         public override JobHandle Process(JobHandle dependsOn)
         {
@@ -34,7 +35,8 @@ namespace PCG.Terrain
                 new VertexAttributeDescriptor(VertexAttribute.Normal, stream: 1)
             };
 
-            var descriptorArray = new NativeArray<VertexAttributeDescriptor>(descriptor, Allocator.Persistent);
+            var descriptorArray = new NativeArray<VertexAttributeDescriptor>(descriptor, Allocator.TempJob);
+            boundsArray = new NativeArray<Bounds>(totalChunks, Allocator.TempJob);
 
             int pointsPerChunk = (int)graph.chunkSize * (int)graph.chunkSize;
             PointsToTerrainJob chunkMeshJob = new PointsToTerrainJob()
@@ -42,13 +44,14 @@ namespace PCG.Terrain
                 numX = (int)graph.chunkSize,
                 numY = (int)graph.chunkSize,
                 points = graph.points,
+                bounds = boundsArray,
                 descriptor = descriptorArray,
                 meshDataArray = meshDataArray,
                 useLOD = useLOD,
                 slope = slope,
                 bias = bias
             };
-            dependsOn = chunkMeshJob.Schedule(totalChunks, dependsOn);
+            dependsOn = chunkMeshJob.ScheduleParallel(totalChunks, totalChunks / batchDivisor, dependsOn);
 
             descriptorArray.Dispose(dependsOn);
 
@@ -68,8 +71,9 @@ namespace PCG.Terrain
             Mesh.ApplyAndDisposeWritableMeshData(meshDataArray, meshes);
             for(int i = 0; i < meshes.Length; i++)
             {
-                meshes[i].RecalculateBounds();
+                meshes[i].bounds = boundsArray[i];
             }
+            boundsArray.Dispose();
         }
     }
 }
