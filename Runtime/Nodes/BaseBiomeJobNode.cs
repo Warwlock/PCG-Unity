@@ -3,11 +3,11 @@ using PCG.Terrain;
 using Unity.Jobs;
 using UnityEngine;
 
-namespace PCG
+namespace PCG.Biome
 {
-    public abstract class BaseChainJobNode : BasePCGNode
+    public abstract class BaseBiomeJobNode : BasePCGNode
     {
-        public new PCGTerrainGraph graph => base.graph as PCGTerrainGraph;
+        public new PCGBiomeGraph graph => base.graph as PCGBiomeGraph;
 
         internal static int batchDivisor => SystemInfo.processorCount / 2;
 

@@ -87,7 +87,7 @@ namespace PCG
                     y = y,
                     z = z
                 };
-                dependsOn = separateJob.ScheduleParallel(pointsIn.Count, BATCH_COUNT, dependsOn);
+                dependsOn = separateJob.Schedule(pointsIn.Count, dependsOn);
 
                 if (octaves == 1)
                 {
@@ -103,7 +103,7 @@ namespace PCG
                         zBuffer = z,
                         outputBuffer = result
                     };
-                    dependsOn = noiseJob.ScheduleParallel(pointsIn.Count, BATCH_COUNT, dependsOn);
+                    dependsOn = noiseJob.Schedule(pointsIn.Count, dependsOn);
                 }
                 else
                 {
@@ -122,7 +122,7 @@ namespace PCG
                         zBuffer = z,
                         outputBuffer = result
                     };
-                    dependsOn = noiseJob.ScheduleParallel(pointsIn.Count, BATCH_COUNT, dependsOn);
+                    dependsOn = noiseJob.Schedule(pointsIn.Count, dependsOn);
                 }
 
                 arrayPos.Dispose(dependsOn);
@@ -146,7 +146,7 @@ namespace PCG
                     y = y,
                     z = z
                 };
-                dependsOn = separateJob.ScheduleParallel(pointsIn.Count, BATCH_COUNT, dependsOn);
+                dependsOn = separateJob.Schedule(pointsIn.Count, dependsOn);
 
                 if (octaves == 1)
                 {
@@ -164,7 +164,7 @@ namespace PCG
                         output1Buffer = result,
                         output2Buffer = result1
                     };
-                    dependsOn = noiseJob.ScheduleParallel(pointsIn.Count, BATCH_COUNT, dependsOn);
+                    dependsOn = noiseJob.Schedule(pointsIn.Count, dependsOn);
                 }
                 else
                 {
@@ -185,7 +185,7 @@ namespace PCG
                         output1Buffer = result,
                         output2Buffer = result1
                     };
-                    dependsOn = noiseJob.ScheduleParallel(pointsIn.Count, BATCH_COUNT, dependsOn);
+                    dependsOn = noiseJob.Schedule(pointsIn.Count, dependsOn);
                 }
 
                 arrayPos.Dispose(dependsOn);
@@ -202,7 +202,7 @@ namespace PCG
                     random = new Unity.Mathematics.Random((uint)graph.seed),
                     result = result
                 };
-                return noiseJob.ScheduleParallel(pointsIn.Count, BATCH_COUNT, dependsOn);
+                return noiseJob.Schedule(pointsIn.Count, dependsOn);
             }
         }
     }

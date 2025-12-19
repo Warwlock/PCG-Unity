@@ -49,7 +49,7 @@ namespace PCG
                 pcgGraph.seed = seed;
                 pcgGraph.ClearDebugPoints();
                 pcgGraph.CallOnStart();
-                if (pcgGraph is PCGTerrainGraph terrainGraph)
+                if (pcgGraph is PCGTerrainGraph)
                 {
                     ProcessTerrainGraph(pcgGraph as PCGTerrainGraph);
                 }
@@ -180,11 +180,10 @@ namespace PCG
         {
             var sortedNodes = graph.nodes.Where(n => n.computeOrder >= 0).OrderBy(n => n.computeOrder).ToList();
 
-            int totalPoints = ((int)graph.chunkSize * graph.chunkX) * ((int)graph.chunkSize * graph.chunkY);
-            graph.points = new NativeArray<float3>(totalPoints, Allocator.Persistent);
+            //int totalPoints = ((int)graph.chunkSize * graph.chunkX) * ((int)graph.chunkSize * graph.chunkY);
+            //graph.points = new NativeArray<float3>(totalPoints, Allocator.Persistent);
 
             int maxLoopCount = 0;
-            bool haveColliderNode = false;
             for (int executionIndex = 0; executionIndex < sortedNodes.Count; executionIndex++)
             {
                 maxLoopCount++;
@@ -209,9 +208,6 @@ namespace PCG
                         nextNode = sortedNodes[executionIndex + 1] as BaseChainJobNode;
 
                     StartCoroutine(WaitJobCompletion(bcjn, nextNode, dependsOn));
-
-                    if (node is Terrain.TerrainCollider)
-                        haveColliderNode = true;
                 }
                 else
                 {
@@ -219,8 +215,11 @@ namespace PCG
                 }
             }
 
-            StartCoroutine(LastProcess(dependsOn, haveColliderNode));
+            StartCoroutine(LastProcess());
         }
+
+        MeshDataArray meshDataArray;
+        NativeArray<Bounds> boundsArray;
 
         IEnumerator WaitJobCompletion(BaseChainJobNode node, BaseChainJobNode nextNode, JobHandle dependecy)
         {
@@ -233,21 +232,29 @@ namespace PCG
             {
                 if (nextNode is PointsToTerrain pttnext)
                 {
-                    var meshDataArray = Mesh.AllocateWritableMeshData(meshes.Length);
-                    pttnext.SetMeshes(meshes, ref meshDataArray);
+                    meshDataArray = Mesh.AllocateWritableMeshData(meshes.Length);
+                    boundsArray = new NativeArray<Bounds>(meshes.Length, Allocator.Persistent);
+                    pttnext.SetMeshes(boundsArray, meshDataArray);
                 }
                 dependsOn = nextNode.OnProcess(dependsOn);
             }
         }
 
-        IEnumerator LastProcess(JobHandle dependsOne, bool generateCollision)
+        IEnumerator LastProcess()
         {
             while (!dependsOn.IsCompleted)
                 yield return null;
 
             dependsOn.Complete();
-            (pcgGraph as PCGTerrainGraph).points.Dispose(dependsOn);
-            if((pcgGraph as PCGTerrainGraph).generateCollisions)
+            //(pcgGraph as PCGTerrainGraph).points.Dispose(dependsOn);
+            for (int i = 0; i < meshes.Length; i++)
+            {
+                meshes[i].Clear();
+                meshes[i].bounds = boundsArray[i];
+            }
+            Mesh.ApplyAndDisposeWritableMeshData(meshDataArray, meshes);
+            boundsArray.Dispose();
+            if ((pcgGraph as PCGTerrainGraph).generateCollisions)
             {
                 NativeArray<EntityId> meshIds = new NativeArray<EntityId>(meshes.Length, Allocator.TempJob);
 

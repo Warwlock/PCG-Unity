@@ -9,14 +9,14 @@ using UnityEngine;
 
 namespace PCG.Terrain
 {
-    [System.Serializable, NodeMenuItem("Noise/NoiseLayer", typeof(PCGTerrainGraph))]
-    public class NoiseLayer : BaseChainJobNode
+    [System.Serializable, NodeMenuItem("Noise/NoiseTerrainLayer", typeof(PCGTerrainGraph))]
+    public class NoiseTerrainLayer : BaseChainJobNode
     {
         [SerializeField]
         public MathOperators.NoiseFunctions noiseFunctions;
 
         [Input]
-        public int input;
+        public NativeArray<float3> pointsIn;
 
         [Input, SerializeField]
         public Vector3 frequency = new Vector3(0.1f, 0.1f, 0.1f);
@@ -26,11 +26,8 @@ namespace PCG.Terrain
         [Input, SerializeField, Range(1, 16)]
         public int octaves = 1;
 
-        string attributeIn = DefaultAttributes.Pos;
-        public string attributeOut = DefaultAttributes.Density;
-
-        [Output]
-        public int output;
+        [Output(allowMultiple = false)]
+        public NativeArray<float3> points;
 
         public override JobHandle Process(JobHandle dependsOn)
         {
@@ -46,9 +43,9 @@ namespace PCG.Terrain
                         yFrequency = frequency.y,
                         zFrequency = frequency.z,
                         amplitude = amplitude,
-                        verts = graph.points
+                        verts = pointsIn
                     };
-                    dependsOn = noiseJob.ScheduleParallel(graph.points.Length, graph.points.Length / batchDivisor, dependsOn);
+                    dependsOn = noiseJob.ScheduleParallel(pointsIn.Length, pointsIn.Length / batchDivisor, dependsOn);
                 }
                 else
                 {
@@ -62,9 +59,9 @@ namespace PCG.Terrain
                         lacunarity = lacunarity,
                         persistence = gain,
                         octaves = octaves,
-                        verts = graph.points
+                        verts = pointsIn
                     };
-                    dependsOn = noiseJob.ScheduleParallel(graph.points.Length, graph.points.Length / batchDivisor, dependsOn);
+                    dependsOn = noiseJob.ScheduleParallel(pointsIn.Length, pointsIn.Length / batchDivisor, dependsOn);
                 }
             }
             else if (noiseFunctions == MathOperators.NoiseFunctions.CellularNoise)
@@ -79,9 +76,9 @@ namespace PCG.Terrain
                         zFrequency = frequency.z,
                         amplitude1 = amplitude,
                         amplitude2 = amplitude,
-                        verts = graph.points
+                        verts = pointsIn
                     };
-                    dependsOn = noiseJob.ScheduleParallel(graph.points.Length, graph.points.Length / batchDivisor, dependsOn);
+                    dependsOn = noiseJob.ScheduleParallel(pointsIn.Length, pointsIn.Length / batchDivisor, dependsOn);
                 }
                 else
                 {
@@ -96,9 +93,9 @@ namespace PCG.Terrain
                         lacunarity = lacunarity,
                         persistence = gain,
                         octaves = octaves,
-                        verts = graph.points
+                        verts = pointsIn
                     };
-                    dependsOn = noiseJob.ScheduleParallel(graph.points.Length, graph.points.Length / batchDivisor, dependsOn);
+                    dependsOn = noiseJob.ScheduleParallel(pointsIn.Length, pointsIn.Length / batchDivisor, dependsOn);
                 }
             }
             else
@@ -106,10 +103,12 @@ namespace PCG.Terrain
                 RandomNoiseTerrainJob noiseJob = new RandomNoiseTerrainJob
                 {
                     random = new Unity.Mathematics.Random((uint)graph.seed),
-                    verts = graph.points
+                    verts = pointsIn
                 };
-                dependsOn = noiseJob.ScheduleParallel(graph.points.Length, graph.points.Length / batchDivisor, dependsOn);
+                dependsOn = noiseJob.ScheduleParallel(pointsIn.Length, pointsIn.Length / batchDivisor, dependsOn);
             }
+
+            points = pointsIn;
 
             return dependsOn;
         }

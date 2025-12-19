@@ -7,7 +7,7 @@ namespace PCG.Terrain
 {
     public class PCGTerrainGraph : PCGGraph
     {
-        public NativeArray<float3> points;
+        //public NativeArray<float3> points;
 
         public ChunkSizeEnum chunkSize = ChunkSizeEnum._48;
         public int chunkX = 10, chunkY = 10;

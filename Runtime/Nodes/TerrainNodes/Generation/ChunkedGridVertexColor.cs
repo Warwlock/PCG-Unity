@@ -1,28 +1,30 @@
 using GraphProcessor;
+using System.Collections.Generic;
 using Unity.Collections;
 using Unity.Jobs;
 using Unity.Mathematics;
 using UnityEngine;
+using UnityEngine.Rendering;
 using static PCG.MathOperators;
-using static UnityEngine.Rendering.VirtualTexturing.Debugging;
+using MeshDataArray = UnityEngine.Mesh.MeshDataArray;
 
 namespace PCG.Terrain
 {
-    [System.Serializable, NodeMenuItem("Generator/ChunkedGridTerrain", typeof(PCGTerrainGraph))]
-    public class ChunkedGridTerrain : BaseChainJobNode
+    [System.Serializable, NodeMenuItem("Generator/ChunkedGridVertexColor", typeof(PCGTerrainGraph))]
+    public class ChunkedGridVertexColor : BaseChainJobNode
     {
         public float pointDst = 0.1f;
 
         [Output(allowMultiple = false)]
-        public NativeArray<float3> points;
+        public NativeArray<half4> points;
 
         public override JobHandle Process(JobHandle dependsOn)
         {
-            Debug.Log("StartA");
+            Debug.Log("StartVert");
             int totalPoints = ((int)graph.chunkSize * graph.chunkX) * ((int)graph.chunkSize * graph.chunkY);
-            points = new NativeArray<float3>(totalPoints, Allocator.Persistent);
+            points = new NativeArray<half4>(totalPoints, Allocator.Persistent);
 
-            ChunkGridTerrainJob jobData = new ChunkGridTerrainJob
+            ChunkGridVertexColorJob jobData = new ChunkGridVertexColorJob
             {
                 numX = (int)graph.chunkSize,
                 numY = (int)graph.chunkSize,
@@ -38,7 +40,7 @@ namespace PCG.Terrain
 
         public override void OnJobCompleted()
         {
-            Debug.Log("GridTerrrain!");
+            Debug.Log("VertexColor!");
         }
     }
 }

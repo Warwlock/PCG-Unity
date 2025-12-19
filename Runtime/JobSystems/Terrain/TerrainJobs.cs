@@ -16,6 +16,7 @@ namespace PCG
     {
         public int numX, numY;
         [ReadOnly] public NativeArray<float3> points;
+        [ReadOnly] public NativeArray<half4> colorPoints;
         [ReadOnly] public NativeArray<VertexAttributeDescriptor> descriptor;
         [WriteOnly] public NativeArray<Bounds> bounds;
         public MeshDataArray meshDataArray;
@@ -34,12 +35,33 @@ namespace PCG
 
             meshData.SetVertexBufferParams(numX * numY, descriptor);
             var vertices = meshData.GetVertexData<float3>(0);
+            var texCoord = meshData.GetVertexData<half2>(2);
 
             for (int i = 0; i < pointsInChunk; i++)
             {
                 vertices[i] = points[globalStartIndex + i];
                 min = math.min(min, vertices[i]);
                 max = math.max(max, vertices[i]);
+            }
+
+            if (colorPoints.IsCreated)
+            {
+                var colors = meshData.GetVertexData<half4>(3);
+                for (int i = 0; i < pointsInChunk; i++)
+                {
+                    colors[i] = colorPoints[globalStartIndex + i];
+                }
+            }
+
+            int uvY = numY - 3;
+            int uvX = numX - 3;
+            for (int y = 1; y < numY - 1; y++)
+            {
+                for (int x = 1; x < numX - 1; x++)
+                {
+                    int uvIndex = x + y * numX;
+                    texCoord[uvIndex] = new half2(new half((x - 1) / (float)(uvX)), new half((y - 1) / (float)(uvY)));
+                }
             }
 
             bounds[index] = new Bounds((min + max) * 0.5f, max - min);
