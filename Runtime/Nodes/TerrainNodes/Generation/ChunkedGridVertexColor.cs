@@ -13,8 +13,6 @@ namespace PCG.Terrain
     [System.Serializable, NodeMenuItem("Generator/ChunkedGridVertexColor", typeof(PCGTerrainGraph))]
     public class ChunkedGridVertexColor : BaseChainJobNode
     {
-        public float pointDst = 0.1f;
-
         [Output(allowMultiple = false)]
         public NativeArray<half4> points;
 
@@ -30,7 +28,7 @@ namespace PCG.Terrain
                 numY = (int)graph.chunkSize,
                 chunkX = graph.chunkX,
                 chunkY = graph.chunkY,
-                pointDst = pointDst,
+                pointDst = graph.pointDistance,
                 result = points
             };
             dependsOn = jobData.Schedule(dependsOn);

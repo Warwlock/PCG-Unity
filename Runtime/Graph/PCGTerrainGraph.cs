@@ -11,6 +11,7 @@ namespace PCG.Terrain
 
         public ChunkSizeEnum chunkSize = ChunkSizeEnum._48;
         public int chunkX = 10, chunkY = 10;
+        public float pointDistance = 0.5f;
 
         public bool generateCollisions;
     }

@@ -11,8 +11,6 @@ namespace PCG.Terrain
     [System.Serializable, NodeMenuItem("Generator/ChunkedGridTerrain", typeof(PCGTerrainGraph))]
     public class ChunkedGridTerrain : BaseChainJobNode
     {
-        public float pointDst = 0.1f;
-
         [Output(allowMultiple = false)]
         public NativeArray<float3> points;
 
@@ -28,7 +26,7 @@ namespace PCG.Terrain
                 numY = (int)graph.chunkSize,
                 chunkX = graph.chunkX,
                 chunkY = graph.chunkY,
-                pointDst = pointDst,
+                pointDst = graph.pointDistance,
                 result = points
             };
             dependsOn = jobData.Schedule(dependsOn);
