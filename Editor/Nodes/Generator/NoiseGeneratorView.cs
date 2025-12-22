@@ -10,10 +10,10 @@ using UnityEngine.UIElements;
 
 namespace PCG.Editor
 {
-    [NodeCustomEditor(typeof(ConstantNode))]
-    public class ConstantNodeView : AttributeStatisticsView
+    [NodeCustomEditor(typeof(NoiseGenerator))]
+    public class NoiseGeneratorView : AttributeStatisticsView
     {
-        ConstantNode node;
+        NoiseGenerator node;
         VisualElement floatElement;
         VisualElement vectorElement;
         VisualElement intElement;
@@ -35,16 +35,17 @@ namespace PCG.Editor
 
         protected override void DrawDefaultInspector(bool fromInspector = false)
         {
-            node = nodeTarget as ConstantNode;
+            node = nodeTarget as NoiseGenerator;
+            base.DrawDefaultInspector(fromInspector);
 
-            var fields = nodeTarget.GetType().GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance)
-				// Filter fields from the BaseNode type since we are only interested in user-defined fields
-				// (better than BindingFlags.DeclaredOnly because we keep any inherited user-defined fields) 
-				.Where(f => f.DeclaringType != typeof(BaseNode));
+            /*var fields = nodeTarget.GetType().GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance)
+                // Filter fields from the BaseNode type since we are only interested in user-defined fields
+                // (better than BindingFlags.DeclaredOnly because we keep any inherited user-defined fields) 
+                .Where(f => f.DeclaringType != typeof(BaseNode));
 
             fields = nodeTarget.OverrideFieldOrder(fields).Reverse();
 
-            var enumField = fields.FirstOrDefault(f => f.Name == "constantType");
+            var enumField = fields.FirstOrDefault(f => f.Name == "noiseFunctions");
             if (enumField != null)
                 DrawField(enumField);
 
@@ -60,41 +61,27 @@ namespace PCG.Editor
                 vectorElement = DrawField(vectorField);
             var intField = fields.FirstOrDefault(f => f.Name == "constantInt");
             if (intField != null)
-                intElement = DrawField(intField);
+                intElement = DrawField(intField);*/
         }
 
         void UpdateVisibility()
         {
-            if(node.constantType == MathOperators.ConstantType.Float)
-            {
-                floatElement.style.display = DisplayStyle.Flex;
-                vectorElement.style.display = DisplayStyle.None;
-                intElement.style.display = DisplayStyle.None;
-            }
 
-            if (node.constantType == MathOperators.ConstantType.Vector3)
-            {
-                floatElement.style.display = DisplayStyle.None;
-                vectorElement.style.display = DisplayStyle.Flex;
-                intElement.style.display = DisplayStyle.None;
-            }
-
-            if (node.constantType == MathOperators.ConstantType.Int)
-            {
-                floatElement.style.display = DisplayStyle.None;
-                vectorElement.style.display = DisplayStyle.None;
-                intElement.style.display = DisplayStyle.Flex;
-            }
         }
 
-        VisualElement DrawField(FieldInfo field)
+        VisualElement DrawField(FieldInfo field, bool fromInspector = false)
         {
+            bool hasInputAttribute = field.GetCustomAttribute(typeof(InputAttribute)) != null;
+            bool hasInputOrOutputAttribute = hasInputAttribute || field.GetCustomAttribute(typeof(OutputAttribute)) != null;
+            bool showAsDrawer = !fromInspector && field.GetCustomAttribute(typeof(ShowAsDrawer)) != null;
+
             string displayName = ObjectNames.NicifyVariableName(field.Name);
 
-				var inspectorNameAttribute = field.GetCustomAttribute<InspectorNameAttribute>();
-				if (inspectorNameAttribute != null)
-					displayName = inspectorNameAttribute.displayName;
+            var inspectorNameAttribute = field.GetCustomAttribute<InspectorNameAttribute>();
+            if (inspectorNameAttribute != null)
+                displayName = inspectorNameAttribute.displayName;
             var elem = AddControlField(field, displayName, false, UpdateVisibility);
+
             return elem;
         }
     }

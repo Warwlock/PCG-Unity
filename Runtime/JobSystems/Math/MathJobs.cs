@@ -111,4 +111,68 @@ namespace PCG
             }
         }
     }
+
+    struct FilterIndexerJob : IJob
+    {
+        public int compareFunction;
+        public float constant;
+        public NativeArray<float> input;
+
+        public NativeList<int> filtrate;
+        public NativeList<int> cake;
+
+        public void Execute()
+        {
+            for (int i = 0; i < input.Length; i++)
+            {
+                ApplyCompareFunction(i);
+            }
+        }
+
+        void ApplyCompareFunction(int i)
+        {
+            if (compareFunction.Equals(0))
+            {
+                if (input[i] > constant)
+                    filtrate.Add(i);
+                else
+                    cake.Add(i);
+            }
+            else if (compareFunction.Equals(1))
+            {
+                if (input[i] < constant)
+                    filtrate.Add(i);
+                else
+                    cake.Add(i);
+            }
+            else if (compareFunction.Equals(2))
+            {
+                if (input[i] >= constant)
+                    filtrate.Add(i);
+                else
+                    cake.Add(i);
+            }
+            else if (compareFunction.Equals(3))
+            {
+                if (input[i] <= constant)
+                    filtrate.Add(i);
+                else
+                    cake.Add(i);
+            }
+            else if (compareFunction.Equals(4))
+            {
+                if (input[i] == constant)
+                    filtrate.Add(i);
+                else
+                    cake.Add(i);
+            }
+            else if (compareFunction.Equals(5))
+            {
+                if (input[i] != constant)
+                    filtrate.Add(i);
+                else
+                    cake.Add(i);
+            }
+        }
+    }
 }

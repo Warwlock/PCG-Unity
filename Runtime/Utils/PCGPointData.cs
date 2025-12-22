@@ -11,6 +11,7 @@ namespace PCG
     {
         void Init(int count);
         IAttributeBuffer Clone();
+        IAttributeBuffer Subset(int[] indices);
         System.Type GetDataType();
         object GetValue(int index);
     }
@@ -30,6 +31,20 @@ namespace PCG
         {
             var buffer = new AttributeBuffer<T>();
             buffer.Data = (T[])Data.Clone();
+            return buffer;
+        }
+
+        public IAttributeBuffer Subset(int[] indices)
+        {
+            var buffer = new AttributeBuffer<T>();
+            buffer.Data = new T[indices.Length];
+
+            for (int i = 0; i < indices.Length; i++)
+            {
+                // indices[i] is the index in the original array
+                buffer.Data[i] = this.Data[indices[i]];
+            }
+
             return buffer;
         }
 
@@ -61,8 +76,18 @@ namespace PCG
         {
             Count = copyData.Count;
             _attributes = copyData._attributes.ToDictionary(entry => entry.Key, entry => entry.Value.Clone());
-            //_attributeTypes = copyData._attributeTypes.ToDictionary(entry => entry.Key, entry => entry.Value);
             lastModifiedAttribute = copyData.lastModifiedAttribute;
+        }
+
+        public PCGPointData(PCGPointData source, int[] indicesToKeep)
+        {
+            Count = indicesToKeep.Length;
+            lastModifiedAttribute = source.lastModifiedAttribute;
+
+            foreach (var entry in source.Attributes)
+            {
+                _attributes.Add(entry.Key, entry.Value.Subset(indicesToKeep));
+            }
         }
 
         public void CreateAttribute<T>(string name, T defaultValue = default)

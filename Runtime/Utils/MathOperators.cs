@@ -38,5 +38,10 @@ namespace PCG
         {
             Float, Vector3, Int
         }
+
+        public enum Compare
+        {
+            Greater, Less, GreaterEqual, LessEqual, Equal, NotEqual
+        }
     }
 }
