@@ -33,5 +33,10 @@ namespace PCG
         {
             RandomNoise, PerlinNoise, CellularNoise
         }
+
+        public enum ConstantType
+        {
+            Float, Vector3, Int
+        }
     }
 }
