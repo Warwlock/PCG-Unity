@@ -22,6 +22,10 @@ namespace PCG
         public int debugPointsCount;
         [HideInInspector] public bool readyForDebugRender;
 
+
+        public List<GameObject> spawnedObjects;
+        public Transform parentTransform;
+
         public void ClearDebugPoints()
         {
             _densityBuffer?.Dispose();
@@ -44,8 +48,25 @@ namespace PCG
             OnUpdate = null;
         }
 
+        public void SpawnGameObject(GameObject prefab, Vector3 pos, Vector3 rot, Vector3 sca)
+        {
+            var obj = Instantiate(prefab, pos, Quaternion.Euler(rot), parentTransform);
+            obj.transform.localScale = sca;
+            spawnedObjects.Add(obj);
+        }
+
+        void ClearObjects()
+        {
+            for (int i = 0; i < spawnedObjects.Count; i++)
+            {
+                SmartDestroy(spawnedObjects[i]);
+            }
+            spawnedObjects.Clear();
+        }
+
         public void CallOnStart()
         {
+            ClearObjects();
             OnStart?.Invoke();
         }
 
@@ -61,6 +82,25 @@ namespace PCG
         public BasePCGNode GetDebugAttributeNode()
         {
             return nodes.Where(x => (x as BasePCGNode).debugAttribute).FirstOrDefault() as BasePCGNode;
+        }
+
+        public static void SmartDestroy(UnityEngine.Object obj)
+        {
+            if (obj == null)
+            {
+                return;
+            }
+
+#if UNITY_EDITOR
+            if (!Application.isPlaying)
+            {
+                GameObject.DestroyImmediate(obj);
+            }
+            else
+#endif
+            {
+                GameObject.Destroy(obj);
+            }
         }
     }
 }

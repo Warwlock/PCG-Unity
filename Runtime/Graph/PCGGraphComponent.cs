@@ -24,6 +24,7 @@ namespace PCG
             {
                 processGraph = false;
                 pcgGraph.seed = seed;
+                pcgGraph.parentTransform = transform;
                 pcgGraph.ClearDebugPoints();
                 pcgGraph.CallOnStart();
                 StartCoroutine(ProcessGraphCoroutine(pcgGraph));

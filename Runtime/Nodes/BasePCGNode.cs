@@ -1,10 +1,13 @@
 using GraphProcessor;
+using UnityEditor.Graphs;
 using UnityEngine;
 
 namespace PCG
 {
     public abstract class BasePCGNode : BaseNode
     {
+        new public PCGGraph graph => base.graph as PCGGraph;
+
         [HideInInspector]
         public bool debugAttribute;
 

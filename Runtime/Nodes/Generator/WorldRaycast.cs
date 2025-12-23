@@ -33,7 +33,7 @@ namespace PCG
             points.CreateAttribute(DefaultAttributes.Rot, Vector3.zero);
 
             resultPos = new NativeArray<Vector3>(pointsIn.GetAttributeList<Vector3>(originAttribute), Allocator.TempJob);
-            resultRot = new NativeArray<Vector3>(pointsIn.Count, Allocator.TempJob);
+            resultRot = new NativeArray<Vector3>(pointsIn.GetAttributeList<Vector3>(DefaultAttributes.Rot), Allocator.TempJob);
 
             handle = JobCreator(handle);
 
@@ -72,7 +72,8 @@ namespace PCG
                 results = results,
                 positions = resultPos,
                 rotations = resultRot,
-                alignNormal = alignToSurfaceNormal
+                alignNormal = alignToSurfaceNormal,
+                inverseDirection = (-rayDirection).normalized
             };
             dependsOn = applyJob.Schedule(dependsOn);
             results.Dispose(dependsOn);

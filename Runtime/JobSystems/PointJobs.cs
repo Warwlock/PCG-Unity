@@ -38,17 +38,19 @@ namespace PCG
 
         public void Execute()
         {
-            var maxRot = Quaternion.Euler(max);
-            var minRot = Quaternion.Euler(min);
+            /*var maxRot = Quaternion.Euler(max);
+            var minRot = Quaternion.Euler(min);*/
             if (absolute)
                 for (int i = 0; i < vector.Length; i++)
                 {
-                    vector[i] = Quaternion.Lerp(minRot, maxRot, density[i]).eulerAngles;
+                    var rotation = Vector3.Lerp(min, max, density[i]);
+                    vector[i] = Quaternion.Euler(rotation).eulerAngles;
                 }
             else
                 for (int i = 0; i < vector.Length; i++)
                 {
-                    vector[i] = (Quaternion.Euler(vector[i]) * Quaternion.Lerp(minRot, maxRot, density[i])).eulerAngles;
+                    var rotation = Vector3.Lerp(min, max, density[i]);
+                    vector[i] = (Quaternion.Euler(vector[i]) * Quaternion.Euler(rotation)).eulerAngles;
                 }
         }
     }
@@ -133,6 +135,7 @@ namespace PCG
         public NativeArray<Vector3> positions;
         public NativeArray<Vector3> rotations;
         public bool alignNormal;
+        public Vector3 inverseDirection;
 
         public void Execute()
         {
@@ -144,7 +147,7 @@ namespace PCG
                     if(!alignNormal) continue;
 
                     Quaternion rotation = Quaternion.Euler(rotations[i]);
-                    rotation = Quaternion.FromToRotation(Vector3.forward, results[i].normal) * rotation;
+                    rotation = Quaternion.FromToRotation(inverseDirection, results[i].normal) * rotation;
                     rotations[i] = rotation.eulerAngles;
                 }
             }
