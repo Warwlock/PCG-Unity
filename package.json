@@ -1,7 +1,7 @@
 {
   "name": "com.warwlock.pcgunity",
   "displayName": "Procedural Content Generation for Unity",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "unity": "6000.2",
   "unityRelease": "12f1",
   "description": "An open-source similar version of Unreal Engine's Procedural Content Generation (PCG) framework for Unity. A node-based system for generating procedural worlds.",
