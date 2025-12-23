@@ -109,7 +109,7 @@ namespace PCG
             {
                 return ((AttributeBuffer<T>)buffer).Data;
             }
-            return null;
+            return new T[0];
         }
 
         public T GetAttribute<T>(string name, int pointIndex, T defaultValue = default)

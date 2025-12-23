@@ -26,6 +26,7 @@ namespace PCG
 
         string attributeIn = DefaultAttributes.Pos;
         public string attributeOut = DefaultAttributes.Density;
+        public int seedOffset = 0;
 
         [Output]
         public PCGPointData points;
@@ -66,6 +67,8 @@ namespace PCG
             NativeArray<float> y;
             NativeArray<float> z;
 
+            int newSeed = (graph as PCGGraph).seed + seedOffset;
+
             if(noiseFunctions == MathOperators.NoiseFunctions.PerlinNoise)
             {
                 arrayPos = new NativeArray<Vector3>(pointsIn.GetAttributeList<Vector3>(DefaultAttributes.Pos), Allocator.TempJob);
@@ -86,7 +89,7 @@ namespace PCG
                 NativeArrayNoiseJob noiseJob = new NativeArrayNoiseJob
                 {
                     noiseType = NoiseType.GradientNoise3D,
-                    seed = (graph as PCGGraph).seed,
+                    seed = newSeed,
                     xFrequency = frequency.x,
                     yFrequency = frequency.y,
                     zFrequency = frequency.z,
@@ -129,7 +132,7 @@ namespace PCG
                 NativeArrayNoiseJob noiseJob = new NativeArrayNoiseJob
                 {
                     noiseType = NoiseType.CellularNoise3D,
-                    seed = (graph as PCGGraph).seed,
+                    seed = newSeed,
                     xFrequency = frequency.x,
                     yFrequency = frequency.y,
                     zFrequency = frequency.z,
@@ -157,7 +160,7 @@ namespace PCG
             {
                 RandomNoiseJob noiseJob = new RandomNoiseJob
                 {
-                    seed = (graph as PCGGraph).seed,
+                    seed = newSeed,
                     result = result
                 };
                 return noiseJob.Schedule(dependsOn);

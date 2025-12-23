@@ -1,5 +1,6 @@
 using Unity.Collections;
 using Unity.Jobs;
+using Unity.Mathematics;
 using UnityEngine;
 
 namespace PCG
@@ -72,6 +73,42 @@ namespace PCG
                 {
                     vector[i] = Vector3.Scale(vector[i], Vector3.Lerp(min, max, density[i]));
                 }
+        }
+    }
+
+    struct PrunePointsJob : IJob
+    {
+        public float radius;
+        public NativeArray<Vector3> positions;
+        public NativeList<int> indices;
+
+        public void Execute()
+        {
+            float sqrRadius = radius * radius;
+
+            for (int i = 0; i < positions.Length; i++)
+            {
+                Vector3 candidatePos = positions[i];
+                bool shouldPrune = false;
+
+                for (int j = 0; j < indices.Length; j++)
+                {
+                    int keptIndex = indices[j];
+                    Vector3 keptPos = positions[keptIndex];
+
+                    // squared distance
+                    if (Vector3.SqrMagnitude(candidatePos - keptPos) < sqrRadius)
+                    {
+                        shouldPrune = true;
+                        break;
+                    }
+                }
+
+                if (!shouldPrune)
+                {
+                    indices.Add(i);
+                }
+            }
         }
     }
 }
