@@ -1,0 +1,610 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c825ba129b1cda446889ed6baaf591fc, type: 3}
+  m_Name: ExampleGraph
+  m_EditorClassIdentifier: PCG-Unity.runtime::PCG.PCGGraph
+  serializedNodes: []
+  nodes:
+  - rid: 359367063511236616
+  - rid: 359367063511236690
+  - rid: 359367063511236699
+  - rid: 359367108262887513
+  - rid: 359367108262887514
+  - rid: 359367108262887515
+  - rid: 359367108262887524
+  - rid: 359367108262887533
+  - rid: 359367108262887563
+  - rid: 359367108262887570
+  - rid: 359367108262887571
+  - rid: 359367108262887589
+  - rid: 359367108262887611
+  - rid: 359367108262887612
+  edges:
+  - GUID: 9cbf08a9-c7d7-430c-890e-4031145fb9b1
+    owner: {fileID: 11400000}
+    inputNodeGUID: 4a6b2c03-f7e1-4d23-ad29-f764aba3f3e3
+    outputNodeGUID: aa0468c1-67ce-49b5-af8f-8b4126ccb597
+    inputFieldName: pointsIn
+    outputFieldName: points
+    inputPortIdentifier: 
+    outputPortIdentifier: 
+  - GUID: f0cb94e3-85e2-46da-920a-8c4296561dd9
+    owner: {fileID: 11400000}
+    inputNodeGUID: fd831319-b076-49ab-a828-dd5f6abb341d
+    outputNodeGUID: 89e935a5-7329-4728-a102-f3ce08bc3833
+    inputFieldName: pointsIn
+    outputFieldName: points
+    inputPortIdentifier: 
+    outputPortIdentifier: 
+  - GUID: 077caa3c-04bf-4f3f-a1d1-aceed8869483
+    owner: {fileID: 11400000}
+    inputNodeGUID: bb9a052e-8114-48da-abb8-732d36e7d03b
+    outputNodeGUID: fd831319-b076-49ab-a828-dd5f6abb341d
+    inputFieldName: pointsIn
+    outputFieldName: points
+    inputPortIdentifier: 
+    outputPortIdentifier: 
+  - GUID: 418f43e7-1e66-4d6d-a5db-22bbbbe88ee8
+    owner: {fileID: 11400000}
+    inputNodeGUID: 252e8fb5-d193-46c8-85b2-7886732995a7
+    outputNodeGUID: 7050909c-f4e8-4174-aa88-76bd9417bbbf
+    inputFieldName: pointsB
+    outputFieldName: points
+    inputPortIdentifier: 
+    outputPortIdentifier: 
+  - GUID: 588f48fc-3dfb-45dc-b151-ac757c272e9f
+    owner: {fileID: 11400000}
+    inputNodeGUID: 252e8fb5-d193-46c8-85b2-7886732995a7
+    outputNodeGUID: bb9a052e-8114-48da-abb8-732d36e7d03b
+    inputFieldName: pointsA
+    outputFieldName: points
+    inputPortIdentifier: 
+    outputPortIdentifier: 
+  - GUID: def4a9f7-9035-464c-a234-e346ecf37c04
+    owner: {fileID: 11400000}
+    inputNodeGUID: 2aab17f4-78f7-4603-8993-4e64d1205f00
+    outputNodeGUID: 252e8fb5-d193-46c8-85b2-7886732995a7
+    inputFieldName: pointsIn
+    outputFieldName: points
+    inputPortIdentifier: 
+    outputPortIdentifier: 
+  - GUID: 99545be5-9dff-4154-9608-d1c9177f7c65
+    owner: {fileID: 11400000}
+    inputNodeGUID: 397d2167-24d2-416e-88c7-b68ea30e82a6
+    outputNodeGUID: f1c45ca7-a41c-4751-8309-0025842bdb52
+    inputFieldName: pointsIn
+    outputFieldName: pointsFiltrate
+    inputPortIdentifier: 
+    outputPortIdentifier: 
+  - GUID: e727c11a-4336-4f39-aae6-f24127df3634
+    owner: {fileID: 11400000}
+    inputNodeGUID: 1270a787-c2f8-459e-86f2-c979e0989ae3
+    outputNodeGUID: 397d2167-24d2-416e-88c7-b68ea30e82a6
+    inputFieldName: pointsIn
+    outputFieldName: points
+    inputPortIdentifier: 
+    outputPortIdentifier: 
+  - GUID: 164c13d4-1cbb-42d6-9888-a77b4a1ca13b
+    owner: {fileID: 11400000}
+    inputNodeGUID: f85c535f-60e6-4ff0-adf4-1d9ae99926f7
+    outputNodeGUID: 1270a787-c2f8-459e-86f2-c979e0989ae3
+    inputFieldName: points
+    outputFieldName: points
+    inputPortIdentifier: 
+    outputPortIdentifier: 
+  - GUID: e390a6d0-f807-436d-9e52-7b37a2db1b50
+    owner: {fileID: 11400000}
+    inputNodeGUID: aa0468c1-67ce-49b5-af8f-8b4126ccb597
+    outputNodeGUID: 539114eb-6bf0-4045-a183-e3a8d36b2d57
+    inputFieldName: pointsIn
+    outputFieldName: points
+    inputPortIdentifier: 
+    outputPortIdentifier: 
+  - GUID: 7927df43-aa3b-409d-891b-768c8914b623
+    owner: {fileID: 11400000}
+    inputNodeGUID: 89e935a5-7329-4728-a102-f3ce08bc3833
+    outputNodeGUID: 4a6b2c03-f7e1-4d23-ad29-f764aba3f3e3
+    inputFieldName: pointsIn
+    outputFieldName: points
+    inputPortIdentifier: 
+    outputPortIdentifier: 
+  - GUID: 47f8aee6-c981-42ec-b013-eea63559f0f0
+    owner: {fileID: 11400000}
+    inputNodeGUID: f1c45ca7-a41c-4751-8309-0025842bdb52
+    outputNodeGUID: 2aab17f4-78f7-4603-8993-4e64d1205f00
+    inputFieldName: pointsIn
+    outputFieldName: points
+    inputPortIdentifier: 
+    outputPortIdentifier: 
+  - GUID: afc32cf0-5ac1-49b5-9ade-5bcba5acbea0
+    owner: {fileID: 11400000}
+    inputNodeGUID: 320f116f-a671-4836-98a4-fe1bd9473bdb
+    outputNodeGUID: 1270a787-c2f8-459e-86f2-c979e0989ae3
+    inputFieldName: pointsIn
+    outputFieldName: points
+    inputPortIdentifier: 
+    outputPortIdentifier: 
+  groups: []
+  stackNodes: []
+  pinnedElements:
+  - position:
+      serializedVersion: 2
+      x: 14
+      y: 33
+      width: 252
+      height: 330
+    opened: 1
+    editorType:
+      serializedType: GraphProcessor.ExposedParameterView, com.alelievr.NodeGraphProcessor.Editor,
+        Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+  exposedParameters:
+  - rid: 359366790955925570
+  - rid: 359366836443152452
+  serializedParameterList: []
+  stickyNotes: []
+  nodeInspectorReference: {fileID: 0}
+  position: {x: 1169, y: 648, z: 0}
+  scale: {x: 1, y: 1, z: 1}
+  debugMesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+  debugMaterial: {fileID: 2100000, guid: 7636b6290bad9724b92b396865618c64, type: 2}
+  debugPointMatrices: []
+  debugPointDensities: []
+  debugPointsCount: 0
+  readyForDebugRender: 0
+  parentTransform: {fileID: 0}
+  references:
+    version: 2
+    RefIds:
+    - rid: 359366790955925570
+      type: {class: FloatParameter, ns: GraphProcessor, asm: com.alelievr.NodeGraphProcessor.Runtime}
+      data:
+        guid: fddde29b-efa2-4210-b7fe-056f91e655cd
+        name: HelloWorld
+        type: 
+        serializedValue:
+          serializedType: 
+          serializedName: 
+          serializedValue: 
+        input: 1
+        settings:
+          rid: 359366790955925571
+        val: 0
+    - rid: 359366790955925571
+      type: {class: FloatParameter/FloatSettings, ns: GraphProcessor, asm: com.alelievr.NodeGraphProcessor.Runtime}
+      data:
+        isHidden: 0
+        expanded: 0
+        guid: fddde29b-efa2-4210-b7fe-056f91e655cd
+        mode: 0
+        min: 0
+        max: 1
+    - rid: 359366836443152452
+      type: {class: Vector3Parameter, ns: GraphProcessor, asm: com.alelievr.NodeGraphProcessor.Runtime}
+      data:
+        guid: 9b6d3483-33c2-4941-b68b-dde2011bfe67
+        name: New Vector 3
+        type: 
+        serializedValue:
+          serializedType: 
+          serializedName: 
+          serializedValue: 
+        input: 1
+        settings:
+          rid: 359366836443152453
+        val: {x: 0, y: 0, z: 0}
+    - rid: 359366836443152453
+      type: {class: ExposedParameter/Settings, ns: GraphProcessor, asm: com.alelievr.NodeGraphProcessor.Runtime}
+      data:
+        isHidden: 0
+        expanded: 0
+        guid: 9b6d3483-33c2-4941-b68b-dde2011bfe67
+    - rid: 359367063511236616
+      type: {class: SimplePointGrid, ns: PCG, asm: PCG-Unity.runtime}
+      data:
+        nodeCustomName: 
+        GUID: 539114eb-6bf0-4045-a183-e3a8d36b2d57
+        computeOrder: 0
+        position:
+          serializedVersion: 2
+          x: -697.34247
+          y: -351
+          width: 165
+          height: 132
+        expanded: 0
+        debug: 0
+        nodeLock: 0
+        debugAttribute: 0
+        XPoints: 100
+        YPoints: 100
+        pointDistance: 0.7
+        points:
+          lastModifiedAttribute: Pos
+          requiresStripping: 0
+          stripAxis: 0
+    - rid: 359367063511236690
+      type: {class: NoiseGenerator, ns: PCG, asm: PCG-Unity.runtime}
+      data:
+        nodeCustomName: 
+        GUID: aa0468c1-67ce-49b5-af8f-8b4126ccb597
+        computeOrder: 1
+        position:
+          serializedVersion: 2
+          x: -370
+          y: -351.00006
+          width: 232
+          height: 252
+        expanded: 1
+        debug: 0
+        nodeLock: 0
+        debugAttribute: 0
+        noiseFunctions: 0
+        pointsIn:
+          lastModifiedAttribute: Pos
+          requiresStripping: 0
+          stripAxis: 0
+        frequency: {x: 0.1, y: 0.1, z: 0.1}
+        amplitude: 1
+        lacunarity: 2
+        gain: 0.5
+        octaves: 1
+        attributeOut: Density
+        seedOffset: 22
+        points:
+          lastModifiedAttribute: Density
+          requiresStripping: 0
+          stripAxis: 0
+    - rid: 359367063511236699
+      type: {class: TransformPoints, ns: PCG, asm: PCG-Unity.runtime}
+      data:
+        nodeCustomName: 
+        GUID: 4a6b2c03-f7e1-4d23-ad29-f764aba3f3e3
+        computeOrder: 2
+        position:
+          serializedVersion: 2
+          x: -3.8501148
+          y: -351.00006
+          width: 172
+          height: 273
+        expanded: 0
+        debug: 0
+        nodeLock: 0
+        debugAttribute: 0
+        pointsIn:
+          lastModifiedAttribute: Density
+          requiresStripping: 0
+          stripAxis: 0
+        OffsetMin: {x: -3, y: 0, z: 0}
+        OffsetMax: {x: 3, y: 0, z: 0}
+        RotationMin: {x: 0, y: 0, z: 0}
+        RotationMax: {x: 0, y: 0, z: 0}
+        ScaleMin: {x: 1, y: 1, z: 1}
+        ScaleMax: {x: 1, y: 1, z: 1}
+        points:
+          lastModifiedAttribute: Pos
+          requiresStripping: 0
+          stripAxis: 0
+        AbsoluteOffset: 0
+        AbsoluteRotation: 0
+        AbsoluteScale: 0
+    - rid: 359367108262887513
+      type: {class: PrunePoints, ns: PCG, asm: PCG-Unity.runtime}
+      data:
+        nodeCustomName: 
+        GUID: bb9a052e-8114-48da-abb8-732d36e7d03b
+        computeOrder: 5
+        position:
+          serializedVersion: 2
+          x: 958.1947
+          y: -460.00006
+          width: 148
+          height: 99
+        expanded: 0
+        debug: 0
+        nodeLock: 0
+        debugAttribute: 0
+        pointsIn:
+          lastModifiedAttribute: Pos
+          requiresStripping: 0
+          stripAxis: 0
+        radius: 10
+        points:
+          lastModifiedAttribute: Pos
+          requiresStripping: 0
+          stripAxis: 0
+    - rid: 359367108262887514
+      type: {class: TransformPoints, ns: PCG, asm: PCG-Unity.runtime}
+      data:
+        nodeCustomName: 
+        GUID: fd831319-b076-49ab-a828-dd5f6abb341d
+        computeOrder: 4
+        position:
+          serializedVersion: 2
+          x: 674
+          y: -351
+          width: 172
+          height: 273
+        expanded: 0
+        debug: 0
+        nodeLock: 0
+        debugAttribute: 0
+        pointsIn:
+          lastModifiedAttribute: Density
+          requiresStripping: 0
+          stripAxis: 0
+        OffsetMin: {x: 0, y: 0, z: -3}
+        OffsetMax: {x: 0, y: 0, z: 3}
+        RotationMin: {x: 0, y: 0, z: 0}
+        RotationMax: {x: 0, y: 0, z: 0}
+        ScaleMin: {x: 1, y: 1, z: 1}
+        ScaleMax: {x: 1, y: 1, z: 1}
+        points:
+          lastModifiedAttribute: Pos
+          requiresStripping: 0
+          stripAxis: 0
+        AbsoluteOffset: 0
+        AbsoluteRotation: 0
+        AbsoluteScale: 0
+    - rid: 359367108262887515
+      type: {class: NoiseGenerator, ns: PCG, asm: PCG-Unity.runtime}
+      data:
+        nodeCustomName: 
+        GUID: 89e935a5-7329-4728-a102-f3ce08bc3833
+        computeOrder: 3
+        position:
+          serializedVersion: 2
+          x: 293
+          y: -351
+          width: 232
+          height: 252
+        expanded: 1
+        debug: 0
+        nodeLock: 0
+        debugAttribute: 0
+        noiseFunctions: 0
+        pointsIn:
+          lastModifiedAttribute: Pos
+          requiresStripping: 0
+          stripAxis: 0
+        frequency: {x: 0.1, y: 0.1, z: 0.1}
+        amplitude: 1
+        lacunarity: 2
+        gain: 0.5
+        octaves: 1
+        attributeOut: Density
+        seedOffset: 274
+        points:
+          lastModifiedAttribute: Density
+          requiresStripping: 0
+          stripAxis: 0
+    - rid: 359367108262887524
+      type: {class: DebugPoints, ns: PCG, asm: PCG-Unity.runtime}
+      data:
+        nodeCustomName: 
+        GUID: f85c535f-60e6-4ff0-adf4-1d9ae99926f7
+        computeOrder: 12
+        position:
+          serializedVersion: 2
+          x: 2664
+          y: -482
+          width: 152
+          height: 94
+        expanded: 0
+        debug: 0
+        nodeLock: 0
+        debugAttribute: 0
+        pointSize: 2
+        points:
+          lastModifiedAttribute: Pos
+          requiresStripping: 0
+          stripAxis: 0
+    - rid: 359367108262887533
+      type: {class: WorldRaycast, ns: PCG, asm: PCG-Unity.runtime}
+      data:
+        nodeCustomName: 
+        GUID: 2aab17f4-78f7-4603-8993-4e64d1205f00
+        computeOrder: 8
+        position:
+          serializedVersion: 2
+          x: 1401.1002
+          y: -482.00012
+          width: 244
+          height: 131
+        expanded: 0
+        debug: 0
+        nodeLock: 0
+        debugAttribute: 0
+        pointsIn:
+          lastModifiedAttribute: Pos
+          requiresStripping: 0
+          stripAxis: 0
+        originAttribute: Pos
+        rayDirection: {x: 0, y: -1, z: 0}
+        alignToSurfaceNormal: 0
+        points:
+          lastModifiedAttribute: Pos
+          requiresStripping: 0
+          stripAxis: 0
+    - rid: 359367108262887563
+      type: {class: Filter, ns: PCG, asm: PCG-Unity.runtime}
+      data:
+        nodeCustomName: 
+        GUID: f1c45ca7-a41c-4751-8309-0025842bdb52
+        computeOrder: 9
+        position:
+          serializedVersion: 2
+          x: 1709
+          y: -482
+          width: 191
+          height: 175
+        expanded: 0
+        debug: 0
+        nodeLock: 0
+        debugAttribute: 0
+        compare: 1
+        axis: 1
+        value: 1
+        pointsIn:
+          lastModifiedAttribute: Pos
+          requiresStripping: 0
+          stripAxis: 0
+        attributeIn: Pos
+        pointsFiltrate:
+          lastModifiedAttribute: Pos
+          requiresStripping: 0
+          stripAxis: 0
+        pointsCake:
+          lastModifiedAttribute: Pos
+          requiresStripping: 0
+          stripAxis: 0
+    - rid: 359367108262887570
+      type: {class: Math, ns: PCG, asm: PCG-Unity.runtime}
+      data:
+        nodeCustomName: 
+        GUID: 252e8fb5-d193-46c8-85b2-7886732995a7
+        computeOrder: 7
+        position:
+          serializedVersion: 2
+          x: 1178.2501
+          y: -460.00015
+          width: 191
+          height: 175
+        expanded: 0
+        debug: 0
+        nodeLock: 0
+        debugAttribute: 0
+        mathFunctions: 0
+        pointsA:
+          lastModifiedAttribute: Pos
+          requiresStripping: 0
+          stripAxis: 0
+        pointsB:
+          lastModifiedAttribute: Constant
+          requiresStripping: 0
+          stripAxis: 0
+        attributeA: '@Last'
+        attributeB: '@Last'
+        attributeOut: '@Last'
+        points:
+          lastModifiedAttribute: Pos
+          requiresStripping: 0
+          stripAxis: 0
+    - rid: 359367108262887571
+      type: {class: ConstantNode, ns: PCG, asm: PCG-Unity.runtime}
+      data:
+        nodeCustomName: 
+        GUID: 7050909c-f4e8-4174-aa88-76bd9417bbbf
+        computeOrder: 6
+        position:
+          serializedVersion: 2
+          x: 881.1
+          y: -285.00006
+          width: 245
+          height: 132
+        expanded: 0
+        debug: 0
+        nodeLock: 0
+        debugAttribute: 0
+        constantType: 1
+        constantFloat: 0
+        constantVector: {x: 0, y: 10, z: 0}
+        constantInt: 0
+        attribute: Constant
+        points:
+          lastModifiedAttribute: Constant
+          requiresStripping: 0
+          stripAxis: 0
+    - rid: 359367108262887589
+      type: {class: SpawnGameObject, ns: PCG, asm: PCG-Unity.runtime}
+      data:
+        nodeCustomName: 
+        GUID: 320f116f-a671-4836-98a4-fe1bd9473bdb
+        computeOrder: 13
+        position:
+          serializedVersion: 2
+          x: 2664
+          y: -375
+          width: 235
+          height: 95
+        expanded: 0
+        debug: 0
+        nodeLock: 0
+        debugAttribute: 0
+        pointsIn:
+          lastModifiedAttribute: Pos
+          requiresStripping: 0
+          stripAxis: 0
+        prefab: {fileID: 8814954091527421693, guid: 803bb8987f77a904eb5f7550b5480d47, type: 3}
+    - rid: 359367108262887611
+      type: {class: NoiseGenerator, ns: PCG, asm: PCG-Unity.runtime}
+      data:
+        nodeCustomName: 
+        GUID: 397d2167-24d2-416e-88c7-b68ea30e82a6
+        computeOrder: 10
+        position:
+          serializedVersion: 2
+          x: 2052.5652
+          y: -482
+          width: 232
+          height: 252
+        expanded: 1
+        debug: 0
+        nodeLock: 0
+        debugAttribute: 0
+        noiseFunctions: 0
+        pointsIn:
+          lastModifiedAttribute: Pos
+          requiresStripping: 0
+          stripAxis: 0
+        frequency: {x: 0.1, y: 0.1, z: 0.1}
+        amplitude: 1
+        lacunarity: 2
+        gain: 0.5
+        octaves: 1
+        attributeOut: Density
+        seedOffset: 353
+        points:
+          lastModifiedAttribute: Density
+          requiresStripping: 0
+          stripAxis: 0
+    - rid: 359367108262887612
+      type: {class: TransformPoints, ns: PCG, asm: PCG-Unity.runtime}
+      data:
+        nodeCustomName: 
+        GUID: 1270a787-c2f8-459e-86f2-c979e0989ae3
+        computeOrder: 11
+        position:
+          serializedVersion: 2
+          x: 2429.2507
+          y: -482.00006
+          width: 172
+          height: 273
+        expanded: 0
+        debug: 0
+        nodeLock: 0
+        debugAttribute: 0
+        pointsIn:
+          lastModifiedAttribute: Density
+          requiresStripping: 0
+          stripAxis: 0
+        OffsetMin: {x: 0, y: 0, z: 0}
+        OffsetMax: {x: 0, y: 0, z: 0}
+        RotationMin: {x: -8.75, y: -180, z: -10.25}
+        RotationMax: {x: 7.83, y: 180, z: 9.09}
+        ScaleMin: {x: 1, y: 1, z: 1}
+        ScaleMax: {x: 1, y: 1, z: 1}
+        points:
+          lastModifiedAttribute: Pos
+          requiresStripping: 0
+          stripAxis: 0
+        AbsoluteOffset: 0
+        AbsoluteRotation: 0
+        AbsoluteScale: 0
