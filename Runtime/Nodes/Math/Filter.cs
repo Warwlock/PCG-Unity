@@ -12,6 +12,8 @@ namespace PCG
     {
         [SerializeField]
         public MathOperators.Compare compare;
+        [SerializeField]
+        public MathOperators.Axis axis;
 
         public float value;
 
@@ -19,14 +21,13 @@ namespace PCG
         public PCGPointData pointsIn;
 
         public string attributeIn = DefaultAttributes.LastModifiedAttribute;
-        public string attributeOut = DefaultAttributes.LastModifiedAttribute;
 
         [Output]
         public PCGPointData pointsFiltrate;
         [Output]
         public PCGPointData pointsCake;
 
-        public NativeArray<float> input;
+        public NativeArrayCollection input;
         public NativeList<int> filtrateIndices;
         public NativeList<int> cakeIndices;
 
@@ -36,7 +37,7 @@ namespace PCG
 
             if (HandlePointErrors(pointsIn)) return emptyHandle;
 
-            input = new NativeArray<float>(pointsIn.GetAttributeList<float>(attributeIn), Allocator.TempJob);
+            input = new NativeArrayCollection(pointsIn, attributeIn);
             filtrateIndices = new NativeList<int>(0, Allocator.TempJob);
             cakeIndices = new NativeList<int>(0, Allocator.TempJob);
 
@@ -59,11 +60,13 @@ namespace PCG
 
         JobHandle JobCreator(JobHandle dependsOn = default)
         {
+            dependsOn = input.CreateStripVector3Job((int)axis + 1, dependsOn);
+
             FilterIndexerJob jobData = new FilterIndexerJob
             {
                 compareFunction = (int)compare,
                 constant = value,
-                input = input,
+                input = input.floatArray,
                 filtrate = filtrateIndices,
                 cake = cakeIndices
             };

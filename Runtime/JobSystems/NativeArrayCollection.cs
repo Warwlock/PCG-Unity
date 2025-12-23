@@ -148,6 +148,24 @@ namespace PCG
             }
         }
 
+        public JobHandle CreateStripVector3Job(int axis, JobHandle dependsOn = default)
+        {
+            if (collectionType != typeof(Vector3))
+                return dependsOn;
+
+            floatArray = new NativeArray<float>(vector3Array.Length, Allocator.TempJob);
+
+            SeparateVector3Job flattenJobA = new SeparateVector3Job
+            {
+                count = vector3Array.Length,
+                axis = stripAxis == 0 ? axis : stripAxis,
+                vector = vector3Array,
+                result = floatArray
+            };
+
+            return flattenJobA.Schedule(dependsOn);
+        }
+
         public void SetPointAttributeList(PCGPointData points, string attribute)
         {
             if (collectionType == typeof(Vector3))
@@ -158,11 +176,11 @@ namespace PCG
                 points.SetAttributeList(attribute, intArray.ToArray());
         }
 
-        public void Dispose()
+        public void Dispose(JobHandle dependsOn = default)
         {
-            floatArray.Dispose();
-            vector3Array.Dispose();
-            intArray.Dispose();
+            floatArray.Dispose(dependsOn);
+            vector3Array.Dispose(dependsOn);
+            intArray.Dispose(dependsOn);
         }
     }
 }

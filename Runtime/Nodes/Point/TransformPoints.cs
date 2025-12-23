@@ -58,9 +58,9 @@ namespace PCG
         {
             handle.Complete();
 
-            points.SetAttributeList(DefaultAttributes.Pos, resultPos.ToArray());
             points.SetAttributeList(DefaultAttributes.Rot, resultRot.ToArray());
             points.SetAttributeList(DefaultAttributes.Sca, resultSca.ToArray());
+            points.SetAttributeList(DefaultAttributes.Pos, resultPos.ToArray());
 
             resultPos.Dispose();
             resultRot.Dispose();

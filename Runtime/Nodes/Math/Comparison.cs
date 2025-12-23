@@ -33,7 +33,7 @@ namespace PCG
         {
             inputPorts.PullDatas();
 
-            if (HandleCouplePointErrors(pointsA, pointsB, attributeA, attributeB)) return emptyHandle;
+            if (HandleCouplePointErrors(pointsA, pointsB, attributeA, attributeB, true)) return emptyHandle;
 
             result = new NativeArrayCollection(pointsA, attributeA);
             inPoint = new NativeArrayCollection(pointsB, attributeB);

@@ -43,5 +43,10 @@ namespace PCG
         {
             Greater, Less, GreaterEqual, LessEqual, Equal, NotEqual
         }
+
+        public enum Axis
+        {
+            X, Y, Z, W
+        }
     }
 }

@@ -111,4 +111,43 @@ namespace PCG
             }
         }
     }
+
+    struct WorldRaycastConstructorJob : IJob
+    {
+        public NativeArray<RaycastCommand> raycastCommand;
+        public NativeArray<Vector3> origins;
+        public Vector3 direction;
+
+        public void Execute()
+        {
+            for(int i = 0; i < origins.Length; i++)
+            {
+                raycastCommand[i] = new RaycastCommand(origins[i], direction, QueryParameters.Default);
+            }
+        }
+    }
+
+    struct WorldRaycastApplyJob : IJob
+    {
+        public NativeArray<RaycastHit> results;
+        public NativeArray<Vector3> positions;
+        public NativeArray<Vector3> rotations;
+        public bool alignNormal;
+
+        public void Execute()
+        {
+            for(int i = 0; i < results.Length; i++)
+            {
+                if (results[i].point != Vector3.zero) // Very dirty solution; it has to be ".collider" but it only works on main thread
+                {
+                    positions[i] = results[i].point;
+                    if(!alignNormal) continue;
+
+                    Quaternion rotation = Quaternion.Euler(rotations[i]);
+                    rotation = Quaternion.FromToRotation(Vector3.forward, results[i].normal) * rotation;
+                    rotations[i] = rotation.eulerAngles;
+                }
+            }
+        }
+    }
 }
