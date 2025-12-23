@@ -18,8 +18,8 @@ Installation
    - **Name:** Warwlock
    - **URL:** `https://registry.npmjs.com`
    - **Scope(s):** com.warwlock
-- Go to `Window --> Package Manager` and click on `My Registries`.
-- Find `Procedural Content Generation for Unity` and install it.
+- Go to `Window --> Package Manager` and click on `+` icon.
+- Click on `Install package by name...` and then enter this: `com.warwlock.pcgunity`.
 
 ### Option 2: Install via Package Manager (Git URL)
 - Open the **Package Manager** and select **Add package from git URL** from the add menu.
