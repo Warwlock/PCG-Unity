@@ -10,6 +10,7 @@ namespace PCG
     {
         public PCGGraph pcgGraph;
         public bool processGraph = false;
+        public bool clearGraph = false;
         public int seed = 42;
 
         void Start()
@@ -20,16 +21,23 @@ namespace PCG
         // Update is called once per frame
         void Update()
         {
+            if (clearGraph)
+            {
+                clearGraph = false;
+                DestroyAllChildren();
+                pcgGraph.ClearDebugPoints();
+            }
             if (processGraph)
             {
                 processGraph = false;
                 pcgGraph.seed = seed;
                 pcgGraph.parentTransform = transform;
+                DestroyAllChildren();
                 pcgGraph.ClearDebugPoints();
                 pcgGraph.CallOnStart();
                 StartCoroutine(ProcessGraphCoroutine(pcgGraph));
             }
-            if(pcgGraph.debugPointsCount > 0 && pcgGraph.debugMesh != null && pcgGraph.debugMaterial != null && pcgGraph._densityBuffer != null && pcgGraph.readyForDebugRender)
+            if (pcgGraph.debugPointsCount > 0 && pcgGraph.debugMesh != null && pcgGraph.debugMaterial != null && pcgGraph._densityBuffer != null && pcgGraph.readyForDebugRender)
             {
                 pcgGraph._densityBuffer.SetData(pcgGraph.debugPointDensities);
                 pcgGraph.debugMaterial.SetBuffer("_InstanceDensityBuffer", pcgGraph._densityBuffer);
@@ -47,6 +55,14 @@ namespace PCG
                     Graphics.RenderMeshInstanced(rparams, pcgGraph.debugMesh, 0, pcgGraph.debugPointMatrices, currentBatchCount, i);
                 }
                 pcgGraph.CallOnUpdate();
+            }
+        }
+
+        void DestroyAllChildren()
+        {
+            for (int i = transform.childCount - 1; i >= 0; i--)
+            {
+                PCGGraph.SmartDestroy(transform.GetChild(i).gameObject);
             }
         }
 
